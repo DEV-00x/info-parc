@@ -1,0 +1,322 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Header Section with Stats -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-0"><i class="fas fa-laptop me-2 text-primary"></i>قائمة الأجهزة</h2>
+                            <p class="text-muted mb-0">إدارة وعرض جميع الأجهزة في النظام</p>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('add_device') }}" class="btn btn-primary me-2">
+                                <i class="fas fa-plus-circle me-1"></i> إضافة جهاز
+                            </a>
+                            <a href="{{ url_for('export_devices_excel') }}" class="btn btn-success">
+                                <i class="fas fa-file-excel me-1"></i> تصدير Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row mb-3">
+        <div class="col-md-3 mb-2">
+            <div class="card shadow-sm border-start border-primary border-4 h-100">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">إجمالي الأجهزة</h6>
+                            <h3 class="mb-0" id="total-devices">{{ devices|length }}</h3>
+                        </div>
+                        <div class="bg-light rounded-circle p-2">
+                            <i class="fas fa-laptop fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-2">
+            <div class="card shadow-sm border-start border-success border-4 h-100">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">أجهزة فعالة</h6>
+                            <h3 class="mb-0" id="active-devices">0</h3>
+                        </div>
+                        <div class="bg-light rounded-circle p-2">
+                            <i class="fas fa-check-circle fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-2">
+            <div class="card shadow-sm border-start border-warning border-4 h-100">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">قيد الصيانة</h6>
+                            <h3 class="mb-0" id="maintenance-devices">0</h3>
+                        </div>
+                        <div class="bg-light rounded-circle p-2">
+                            <i class="fas fa-tools fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-2">
+            <div class="card shadow-sm border-start border-danger border-4 h-100">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">غير فعالة</h6>
+                            <h3 class="mb-0" id="inactive-devices">0</h3>
+                        </div>
+                        <div class="bg-light rounded-circle p-2">
+                            <i class="fas fa-times-circle fa-2x text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Filter Card -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white py-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>تصفية وبحث</h5>
+                <button class="btn btn-sm btn-outline-secondary" id="reset-filters">
+                    <i class="fas fa-redo me-1"></i>إعادة تعيين
+                </button>
+            </div>
+        </div>
+        <div class="card-body py-2">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <label for="type-filter" class="form-label small">نوع الجهاز</label>
+                    <select id="type-filter" class="form-select form-select-sm">
+                        <option value="">جميع الأنواع</option>
+                        <option value="حاسوب مكتبي">حاسوب مكتبي</option>
+                        <option value="حاسوب محمول">حاسوب محمول</option>
+                        <option value="طابعة">طابعة</option>
+                        <option value="ماسح ضوئي">ماسح ضوئي</option>
+                        <option value="راوتر">راوتر</option>
+                        <option value="سويتش">سويتش</option>
+                        <option value="خادم">خادم</option>
+                        <option value="آخر">آخر</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="status-filter" class="form-label small">الحالة</label>
+                    <select id="status-filter" class="form-select form-select-sm">
+                        <option value="">جميع الحالات</option>
+                        <option value="فعال">فعال</option>
+                        <option value="غير فعال">غير فعال</option>
+                        <option value="قيد الصيانة">قيد الصيانة</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="location-filter" class="form-label small">الموقع</label>
+                    <select id="location-filter" class="form-select form-select-sm">
+                        <option value="">جميع المواقع</option>
+                        {% set locations = [] %}
+                        {% for device in devices %}
+                            {% if device.location and device.location not in locations %}
+                                {% set _ = locations.append(device.location) %}
+                                <option value="{{ device.location }}">{{ device.location }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="search-input" class="form-label small">بحث</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" id="search-input" class="form-control" placeholder="بحث بالاسم أو الرقم التسلسلي...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Devices Table Card -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm mb-0" id="devices-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0">#</th>
+                            <th class="border-0">الاسم</th>
+                            <th class="border-0">النوع</th>
+                            <th class="border-0">الرقم التسلسلي</th>
+                            <th class="border-0">الحالة</th>
+                            <th class="border-0">الموقع</th>
+                            <th class="border-0">المسؤول</th>
+                            <th class="border-0 text-center">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for device in devices %}
+                        <tr data-type="{{ device.type }}" data-status="{{ device.status }}" data-location="{{ device.location }}">
+                            <td>{{ device.id }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if device.type == 'حاسوب مكتبي' %}
+                                        <i class="fas fa-desktop text-primary me-1"></i>
+                                    {% elif device.type == 'حاسوب محمول' %}
+                                        <i class="fas fa-laptop text-primary me-1"></i>
+                                    {% elif device.type == 'طابعة' %}
+                                        <i class="fas fa-print text-primary me-1"></i>
+                                    {% elif device.type == 'ماسح ضوئي' %}
+                                        <i class="fas fa-scanner text-primary me-1"></i>
+                                    {% elif device.type == 'راوتر' %}
+                                        <i class="fas fa-wifi text-primary me-1"></i>
+                                    {% elif device.type == 'سويتش' %}
+                                        <i class="fas fa-network-wired text-primary me-1"></i>
+                                    {% elif device.type == 'خادم' %}
+                                        <i class="fas fa-server text-primary me-1"></i>
+                                    {% else %}
+                                        <i class="fas fa-hdd text-primary me-1"></i>
+                                    {% endif %}
+                                    <span class="small">{{ device.name }}</span>
+                                </div>
+                            </td>
+                            <td class="small">{{ device.type }}</td>
+                            <td class="small">{{ device.serial_number }}</td>
+                            <td>
+                                {% if device.status == 'فعال' %}
+                                    <span class="badge bg-success">{{ device.status }}</span>
+                                {% elif device.status == 'قيد الصيانة' %}
+                                    <span class="badge bg-warning text-dark">{{ device.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ device.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="small">
+                                {% if device.location %}
+                                    <i class="fas fa-map-marker-alt me-1 text-muted"></i> {{ device.location }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="small">
+                                {% if device.owner %}
+                                    <i class="fas fa-user me-1 text-muted"></i> {{ device.owner }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="{{ url_for('device_details', device_id=device.id) }}" class="btn btn-sm btn-outline-info me-1 py-0 px-1" data-bs-toggle="tooltip" title="عرض التفاصيل">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('edit_device', device_id=device.id) }}" class="btn btn-sm btn-outline-warning me-1 py-0 px-1" data-bs-toggle="tooltip" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('add_maintenance', device_id=device.id) }}" class="btn btn-sm btn-outline-primary me-1 py-0 px-1" data-bs-toggle="tooltip" title="إضافة صيانة">
+                                        <i class="fas fa-tools"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-danger py-0 px-1" data-bs-toggle="modal" data-bs-target="#deleteModal{{ device.id }}" title="حذف">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="text-center py-4 d-none">
+                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" alt="No devices" style="width: 100px; opacity: 0.5;" class="mb-2">
+                <h6 class="text-muted">لا توجد أجهزة مطابقة للبحث</h6>
+                <p class="text-muted small">حاول تغيير معايير البحث أو <button id="clear-filters" class="btn btn-link p-0 small">إعادة تعيين الفلاتر</button></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modals -->
+{% for device in devices %}
+<div class="modal fade" id="deleteModal{{ device.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ device.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white py-2">
+                <h5 class="modal-title" id="deleteModal{{ device.id }}">تأكيد الحذف</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من رغبتك في حذف الجهاز <strong>{{ device.name }}</strong>؟</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>هذا الإجراء لا يمكن التراجع عنه وسيتم حذف جميع سجلات الصيانة المرتبطة بهذا الجهاز.</p>
+            </div>
+            <div class="modal-footer py-1">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <a href="{{ url_for('delete_device', device_id=device.id) }}" class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash me-1"></i> تأكيد الحذف
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/table-filters.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize table filter
+        const deviceFilter = new TableFilter({
+            tableId: 'devices-table',
+            emptyStateId: 'empty-state',
+            filterSelectors: {
+                type: '#type-filter',
+                status: '#status-filter',
+                location: '#location-filter'
+            },
+            dataAttributes: ['type', 'status', 'location'],
+            statsCounters: {
+                active: {
+                    elementId: 'active-devices',
+                    dataAttr: 'status',
+                    value: 'فعال'
+                },
+                maintenance: {
+                    elementId: 'maintenance-devices',
+                    dataAttr: 'status',
+                    value: 'قيد الصيانة'
+                },
+                inactive: {
+                    elementId: 'inactive-devices',
+                    dataAttr: 'status',
+                    value: 'غير فعال'
+                }
+            }
+        });
+        
+        // Add hover effects to rows
+        const rows = document.querySelectorAll('#devices-table tbody tr');
+        rows.forEach(row => {
+            row.addEventListener('mouseover', function() {
+                this.classList.add('bg-light');
+                this.style.transition = 'background-color 0.2s ease';
+            });
+            row.addEventListener('mouseout', function() {
+                this.classList.remove('bg-light');
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

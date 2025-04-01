@@ -1,0 +1,215 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Header Section -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0 bg-light animate__animated animate__fadeIn">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0"><i class="fas fa-plus-circle me-2 text-primary"></i>إضافة جهاز جديد</h4>
+                            <p class="text-muted small mb-0">أدخل معلومات الجهاز الجديد</p>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('devices') }}" class="btn btn-sm btn-outline-secondary btn-interactive">
+                                <i class="fas fa-arrow-right me-1"></i> العودة للقائمة
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Device Form Card -->
+    <div class="card shadow-sm hover-card animate__animated animate__fadeIn">
+        <div class="card-body p-3">
+            <form method="POST" action="{{ url_for('add_device') }}" class="needs-validation" novalidate>
+                <!-- Basic Information Section -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 class="border-bottom pb-1 mb-2"><i class="fas fa-info-circle me-2 text-primary"></i>المعلومات الأساسية</h6>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="name" class="form-label small">اسم الجهاز <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light"><i class="fas fa-desktop"></i></span>
+                            <input type="text" class="form-control form-control-sm" id="name" name="name" required>
+                            <div class="invalid-feedback">
+                                يرجى إدخال اسم الجهاز
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="type" class="form-label small">نوع الجهاز <span class="text-danger">*</span></label>
+                        <select class="form-select form-select-sm" id="type" name="type" required>
+                            <option value="">اختر نوع الجهاز</option>
+                            <option value="حاسوب مكتبي">حاسوب مكتبي</option>
+                            <option value="حاسوب محمول">حاسوب محمول</option>
+                            <option value="طابعة">طابعة</option>
+                            <option value="ماسح ضوئي">ماسح ضوئي</option>
+                            <option value="راوتر">راوتر</option>
+                            <option value="سويتش">سويتش</option>
+                            <option value="خادم">خادم</option>
+                            <option value="آخر">آخر</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            يرجى اختيار نوع الجهاز
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Information Section -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 class="border-bottom pb-1 mb-2"><i class="fas fa-clipboard-list me-2 text-primary"></i>معلومات إضافية</h6>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <label for="serial_number" class="form-label small">الرقم التسلسلي <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light"><i class="fas fa-barcode"></i></span>
+                            <input type="text" class="form-control form-control-sm" id="serial_number" name="serial_number" required>
+                            <div class="invalid-feedback">
+                                يرجى إدخال الرقم التسلسلي
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Status and Location Section -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 class="border-bottom pb-1 mb-2"><i class="fas fa-map-marked-alt me-2 text-primary"></i>الحالة والموقع</h6>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="status" class="form-label small">الحالة <span class="text-danger">*</span></label>
+                        <select class="form-select form-select-sm" id="status" name="status" required>
+                            <option value="فعال">فعال</option>
+                            <option value="غير فعال">غير فعال</option>
+                            <option value="قيد الصيانة">قيد الصيانة</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            يرجى اختيار حالة الجهاز
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="location" class="form-label small">الموقع</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light"><i class="fas fa-map-marker-alt"></i></span>
+                            <input type="text" class="form-control form-control-sm" id="location" name="location">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ownership Information Section -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 class="border-bottom pb-1 mb-2"><i class="fas fa-user-tag me-2 text-primary"></i>معلومات المسؤولية</h6>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="owner" class="form-label small">المسؤول عن الجهاز</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control form-control-sm" id="owner" name="owner" placeholder="اسم الشخص المسؤول">
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="department" class="form-label small">القسم</label>
+                        <select class="form-select form-select-sm" id="department" name="department">
+                            <option value="">اختر القسم</option>
+                            <option value="الإدارة">الإدارة</option>
+                            <option value="المالية">المالية</option>
+                            <option value="الموارد البشرية">الموارد البشرية</option>
+                            <option value="تكنولوجيا المعلومات">تكنولوجيا المعلومات</option>
+                            <option value="المبيعات">المبيعات</option>
+                            <option value="التسويق">التسويق</option>
+                            <option value="خدمة العملاء">خدمة العملاء</option>
+                            <option value="آخر">آخر</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Additional Details Section -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 class="border-bottom pb-1 mb-2"><i class="fas fa-file-alt me-2 text-primary"></i>تفاصيل إضافية</h6>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <label for="notes" class="form-label small">ملاحظات</label>
+                        <textarea class="form-control form-control-sm" id="notes" name="notes" rows="2" placeholder="أي معلومات إضافية عن الجهاز..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('devices') }}" class="btn btn-sm btn-outline-secondary me-md-2 btn-interactive">
+                        <i class="fas fa-times me-1"></i>إلغاء
+                    </a>
+                    <button type="submit" class="btn btn-sm btn-primary btn-interactive">
+                        <i class="fas fa-save me-1"></i>حفظ الجهاز
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Form validation script
+    (function() {
+        'use strict';
+        
+        // Fetch all forms we want to apply validation styles to
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+    
+    // Dynamic icon change based on device type
+    document.getElementById('type').addEventListener('change', function() {
+        const iconElement = document.querySelector('label[for="name"] + div .input-group-text i');
+        const deviceType = this.value;
+        
+        // Remove all existing classes except fas
+        iconElement.className = 'fas';
+        
+        // Add appropriate icon class based on device type
+        switch(deviceType) {
+            case 'حاسوب مكتبي':
+                iconElement.classList.add('fa-desktop');
+                break;
+            case 'حاسوب محمول':
+                iconElement.classList.add('fa-laptop');
+                break;
+            case 'طابعة':
+                iconElement.classList.add('fa-print');
+                break;
+            case 'ماسح ضوئي':
+                iconElement.classList.add('fa-scanner');
+                break;
+            case 'راوتر':
+                iconElement.classList.add('fa-wifi');
+                break;
+            case 'سويتش':
+                iconElement.classList.add('fa-network-wired');
+                break;
+            case 'خادم':
+                iconElement.classList.add('fa-server');
+                break;
+            default:
+                iconElement.classList.add('fa-hdd');
+                break;
+        }
+    });
+</script>
+{% endblock %}

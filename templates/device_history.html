@@ -1,0 +1,235 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0 bg-light animate__animated animate__fadeIn">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-0"><i class="fas fa-history me-2 text-primary"></i>سجل تاريخ الجهاز</h2>
+                            <p class="text-muted">عرض سجل تاريخ التغييرات للجهاز: {{ device.name }}</p>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('device_details', device_id=device.id) }}" class="btn btn-outline-primary me-2 btn-interactive">
+                                <i class="fas fa-arrow-left me-1"></i> العودة للتفاصيل
+                            </a>
+                            <a href="{{ url_for('devices') }}" class="btn btn-outline-secondary btn-interactive">
+                                <i class="fas fa-list me-1"></i> قائمة الأجهزة
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Info Card -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm animate__animated animate__fadeIn" style="animation-delay: 0.1s;">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2 text-primary"></i>معلومات الجهاز</h5>
+                        <span class="badge bg-{{ 'success' if device.status == 'فعال' else 'warning' if device.status == 'قيد الصيانة' else 'danger' }}">{{ device.status }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="d-flex align-items-center">
+                                {% if device.type == 'حاسوب مكتبي' %}
+                                    <i class="fas fa-desktop text-primary me-2 fa-2x"></i>
+                                {% elif device.type == 'حاسوب محمول' %}
+                                    <i class="fas fa-laptop text-primary me-2 fa-2x"></i>
+                                {% elif device.type == 'طابعة' %}
+                                    <i class="fas fa-print text-primary me-2 fa-2x"></i>
+                                {% elif device.type == 'ماسح ضوئي' %}
+                                    <i class="fas fa-scanner text-primary me-2 fa-2x"></i>
+                                {% elif device.type == 'راوتر' %}
+                                    <i class="fas fa-wifi text-primary me-2 fa-2x"></i>
+                                {% elif device.type == 'سويتش' %}
+                                    <i class="fas fa-network-wired text-primary me-2 fa-2x"></i>
+                                {% elif device.type == 'خادم' %}
+                                    <i class="fas fa-server text-primary me-2 fa-2x"></i>
+                                {% else %}
+                                    <i class="fas fa-hdd text-primary me-2 fa-2x"></i>
+                                {% endif %}
+                                <div>
+                                    <h5 class="mb-0">{{ device.name }}</h5>
+                                    <small class="text-muted">{{ device.type }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <p class="mb-0 text-muted">الرقم التسلسلي</p>
+                            <p class="mb-0"><strong>{{ device.serial_number }}</strong></p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <p class="mb-0 text-muted">المالك الحالي</p>
+                            <p class="mb-0"><strong>{{ device.owner or 'غير محدد' }}</strong></p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <p class="mb-0 text-muted">الموقع الحالي</p>
+                            <p class="mb-0"><strong>{{ device.location or 'غير محدد' }}</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Timeline Card -->
+    <div class="card shadow-sm animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="fas fa-history me-2 text-primary"></i>سجل التغييرات</h5>
+        </div>
+        <div class="card-body">
+            {% if history_records %}
+                <div class="timeline">
+                    {% for record in history_records %}
+                        <!-- Make the timeline more compact -->
+                        <div class="timeline-item animate__animated animate__fadeInUp" style="animation-delay: {{ loop.index * 0.1 }}s;">
+                            <div class="timeline-left">
+                                <div class="timeline-date small">{{ record.change_date.strftime('%Y-%m-%d') }}</div>
+                                <div class="timeline-time small">{{ record.change_date.strftime('%H:%M') }}</div>
+                            </div>
+                            <div class="timeline-separator">
+                                <div class="timeline-icon 
+                                    {% if record.change_type == 'تغيير المالك' %}bg-primary
+                                    {% elif record.change_type == 'تغيير الموقع' %}bg-success
+                                    {% elif record.change_type == 'تغيير القسم' %}bg-info
+                                    {% elif record.change_type == 'تغيير الحالة' %}bg-warning
+                                    {% else %}bg-secondary{% endif %}">
+                                    {% if record.change_type == 'تغيير المالك' %}<i class="fas fa-user"></i>
+                                    {% elif record.change_type == 'تغيير الموقع' %}<i class="fas fa-map-marker-alt"></i>
+                                    {% elif record.change_type == 'تغيير القسم' %}<i class="fas fa-building"></i>
+                                    {% elif record.change_type == 'تغيير الحالة' %}<i class="fas fa-toggle-on"></i>
+                                    {% else %}<i class="fas fa-edit"></i>{% endif %}
+                                </div>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="card shadow-sm">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">{{ record.change_type }}</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <p class="mb-1 text-muted">القيمة السابقة</p>
+                                                <p class="mb-0"><strong>{{ record.previous_value }}</strong></p>
+                                            </div>
+                                            <div class="col-md-2 text-center">
+                                                <i class="fas fa-arrow-right text-muted"></i>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <p class="mb-1 text-muted">القيمة الجديدة</p>
+                                                <p class="mb-0"><strong>{{ record.new_value }}</strong></p>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="d-flex justify-content-between">
+                                            <small class="text-muted">تم بواسطة: {{ record.changed_by }}</small>
+                                            <small class="text-muted">{{ record.change_date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                                        </div>
+                                        {% if record.notes %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">ملاحظات: {{ record.notes }}</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <img src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png" alt="No history" style="width: 120px; opacity: 0.5;" class="mb-3">
+                    <h5 class="text-muted">لا يوجد سجل تاريخي للجهاز</h5>
+                    <p class="text-muted">سيتم تسجيل التغييرات في المالك والموقع والقسم والحالة تلقائيًا عند تعديل بيانات الجهاز.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Timeline Styles */
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+    
+    .timeline:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: #e9ecef;
+        left: 31px;
+        margin-left: -1.5px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+        display: flex;
+    }
+    
+    .timeline-left {
+        width: 110px;
+        text-align: right;
+        padding-right: 15px;
+    }
+    
+    .timeline-date {
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .timeline-time {
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+    .timeline-separator {
+        position: relative;
+        width: 60px;
+        text-align: center;
+    }
+    
+    .timeline-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+        position: relative;
+    }
+    
+    .timeline-content {
+        flex: 1;
+        padding-left: 15px;
+    }
+    
+    /* Animation for timeline items */
+    .timeline-item {
+        transition: all 0.3s ease;
+    }
+    
+    .timeline-item:hover {
+        transform: translateY(-5px);
+    }
+    
+    .timeline-item:hover .timeline-icon {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

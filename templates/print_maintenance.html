@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير صيانة - {{ maintenance_record.id }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        .report-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        .report-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .report-subtitle {
+            font-size: 18px;
+            color: #666;
+        }
+        .report-info {
+            margin-bottom: 30px;
+        }
+        .report-section {
+            margin-bottom: 30px;
+        }
+        .report-section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .signature-section {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-box {
+            border-top: 1px solid #333;
+            width: 200px;
+            text-align: center;
+            padding-top: 10px;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="no-print mb-4">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> طباعة التقرير
+            </button>
+            <a href="{{ url_for('device_details', device_id=device.id) }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> العودة
+            </a>
+        </div>
+        
+        <div class="report-header">
+            <div class="report-title">تقرير صيانة الأجهزة</div>
+            <div class="report-subtitle">مصلحة الإعلام الآلي</div>
+        </div>
+        
+        <div class="report-info">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="report-section">
+                        <div class="report-section-title">معلومات الجهاز</div>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 30%">اسم الجهاز</th>
+                                <td>{{ device.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>النوع</th>
+                                <td>{{ device.type }}</td>
+                            </tr>
+                            <tr>
+                                <th>الرقم التسلسلي</th>
+                                <td>{{ device.serial_number }}</td>
+                            </tr>
+                            <tr>
+                                <th>الموقع</th>
+                                <td>{{ device.location }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="report-section">
+                        <div class="report-section-title">معلومات الصيانة</div>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 30%">رقم الصيانة</th>
+                                <td>{{ maintenance_record.id }}</td>
+                            </tr>
+                            <tr>
+                                <th>تاريخ الصيانة</th>
+                                <td>{{ maintenance_record.maintenance_date.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            <tr>
+                                <th>الحالة</th>
+                                <td>{{ maintenance_record.status }}</td>
+                            </tr>
+                            <tr>
+                                <th>الفني المسؤول</th>
+                                <td>{{ maintenance_record.technician }}</td>
+                            </tr>
+                            {% if maintenance_record.completion_date %}
+                            <tr>
+                                <th>تاريخ الإكمال</th>
+                                <td>{{ maintenance_record.completion_date.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if maintenance_record.cost %}
+                            <tr>
+                                <th>التكلفة</th>
+                                <td>{{ maintenance_record.cost }} دج</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="report-section">
+            <div class="report-section-title">وصف المشكلة</div>
+            <div class="p-3 bg-light rounded">
+                {{ maintenance_record.issue_description }}
+            </div>
+        </div>
+        
+        {% if maintenance_record.solution %}
+        <div class="report-section">
+            <div class="report-section-title">الحل / الإجراءات المتخذة</div>
+            <div class="p-3 bg-light rounded">
+                {{ maintenance_record.solution }}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="signature-section">
+            <div class="signature-box">
+                <div>توقيع الفني</div>
+                <div>{{ maintenance_record.technician }}</div>
+            </div>
+            <div class="signature-box">
+                <div>توقيع المسؤول</div>
+                <div>........................</div>
+            </div>
+            <div class="signature-box">
+                <div>توقيع المستلم</div>
+                <div>........................</div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-5">
+            <p>تم إنشاء هذا التقرير بتاريخ: {{ now.strftime('%Y-%m-%d') }}</p>
+        </div>
+    </div>
+</body>
+</html>

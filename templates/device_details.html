@@ -1,0 +1,263 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Header Section -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-0"><i class="fas fa-laptop me-2 text-primary"></i>{{ device.name }}</h2>
+                            <p class="text-muted mb-0">{{ device.type }} - {{ device.serial_number }}</p>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('edit_device', device_id=device.id) }}" class="btn btn-warning me-2">
+                                <i class="fas fa-edit me-1"></i> تعديل الجهاز
+                            </a>
+                            <a href="{{ url_for('add_maintenance', device_id=device.id) }}" class="btn btn-primary">
+                                <i class="fas fa-tools me-1"></i> إضافة صيانة
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Information Section -->
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white py-2">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2 text-primary"></i>معلومات الجهاز</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-bordered table-sm mb-0">
+                                <tr>
+                                    <th class="bg-light" style="width: 40%">الاسم</th>
+                                    <td>{{ device.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">النوع</th>
+                                    <td>
+                                        {% if device.type == 'حاسوب مكتبي' %}
+                                            <i class="fas fa-desktop text-primary me-1"></i>
+                                        {% elif device.type == 'حاسوب محمول' %}
+                                            <i class="fas fa-laptop text-primary me-1"></i>
+                                        {% elif device.type == 'طابعة' %}
+                                            <i class="fas fa-print text-primary me-1"></i>
+                                        {% elif device.type == 'ماسح ضوئي' %}
+                                            <i class="fas fa-scanner text-primary me-1"></i>
+                                        {% elif device.type == 'راوتر' %}
+                                            <i class="fas fa-wifi text-primary me-1"></i>
+                                        {% elif device.type == 'سويتش' %}
+                                            <i class="fas fa-network-wired text-primary me-1"></i>
+                                        {% elif device.type == 'خادم' %}
+                                            <i class="fas fa-server text-primary me-1"></i>
+                                        {% else %}
+                                            <i class="fas fa-hdd text-primary me-1"></i>
+                                        {% endif %}
+                                        {{ device.type }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">الرقم التسلسلي</th>
+                                    <td>{{ device.serial_number }}</td>
+                                </tr>
+                                <!-- Purchase date row removed -->
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-bordered table-sm mb-0">
+                                <tr>
+                                    <th class="bg-light" style="width: 40%">الحالة</th>
+                                    <td>
+                                        {% if device.status == 'فعال' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>{{ device.status }}
+                                            </span>
+                                        {% elif device.status == 'قيد الصيانة' %}
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-tools me-1"></i>{{ device.status }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times-circle me-1"></i>{{ device.status }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">الموقع</th>
+                                    <td>
+                                        <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                        {{ device.location or 'غير محدد' }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">المسؤول</th>
+                                    <td>
+                                        <i class="fas fa-user text-primary me-1"></i>
+                                        {{ device.owner or 'غير محدد' }}
+                                    </td>
+                                </tr>
+                                <!-- Device age row removed -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white py-2">
+                    <h5 class="mb-0"><i class="fas fa-sticky-note me-2 text-primary"></i>ملاحظات</h5>
+                </div>
+                <div class="card-body">
+                    {% if device.notes %}
+                        <p class="mb-0">{{ device.notes }}</p>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-sticky-note fa-3x mb-2 opacity-25"></i>
+                            <p>لا توجد ملاحظات مسجلة لهذا الجهاز</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Records Section -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white py-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history me-2 text-primary"></i>سجلات الصيانة</h5>
+                <a href="{{ url_for('add_maintenance', device_id=device.id) }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i> إضافة سجل صيانة
+                </a>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            {% if maintenance_records %}
+            <div class="table-responsive">
+                <table class="table table-hover table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0">#</th>
+                            <th class="border-0">تاريخ الصيانة</th>
+                            <th class="border-0">وصف المشكلة</th>
+                            <th class="border-0">الإجراءات المتخذة</th>
+                            <th class="border-0">الحالة</th>
+                            <th class="border-0">الفني</th>
+                            <th class="border-0">تاريخ الإكمال</th>
+                            <th class="border-0 text-center">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in maintenance_records %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td class="small">
+                                <i class="fas fa-calendar-day text-primary me-1"></i>
+                                {{ record.maintenance_date.strftime('%Y-%m-%d') }}
+                            </td>
+                            <td>
+                                <span class="d-inline-block text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip" title="{{ record.issue_description }}">
+                                    {{ record.issue_description }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="d-inline-block text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip" title="{{ record.actions_taken or 'لا توجد إجراءات مسجلة' }}">
+                                    {{ record.actions_taken or 'لا توجد إجراءات مسجلة' }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if record.status == 'مكتمل' %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>{{ record.status }}
+                                    </span>
+                                {% elif record.status == 'قيد التنفيذ' %}
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-cog fa-spin me-1"></i>{{ record.status }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-clock me-1"></i>{{ record.status }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="small">
+                                <i class="fas fa-user-cog text-muted me-1"></i>
+                                {{ record.technician }}
+                            </td>
+                            <td class="small">
+                                {% if record.completion_date %}
+                                    <i class="fas fa-calendar-check text-success me-1"></i>
+                                    {{ record.completion_date.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    <i class="fas fa-hourglass-half text-warning me-1"></i>
+                                    غير مكتمل
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="{{ url_for('edit_maintenance', record_id=record.id) }}" class="btn btn-sm btn-outline-warning me-1 py-0 px-1" data-bs-toggle="tooltip" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('print_maintenance', record_id=record.id) }}" class="btn btn-sm btn-outline-info py-0 px-1" target="_blank" data-bs-toggle="tooltip" title="طباعة">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <img src="https://cdn-icons-png.flaticon.com/512/5058/5058432.png" alt="No maintenance records" style="width: 100px; opacity: 0.5;" class="mb-3">
+                <h5 class="text-muted">لا توجد سجلات صيانة لهذا الجهاز</h5>
+                <p class="text-muted">يمكنك إضافة سجل صيانة جديد من خلال الضغط على زر "إضافة سجل صيانة"</p>
+                <a href="{{ url_for('add_maintenance', device_id=device.id) }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus-circle me-1"></i> إضافة سجل صيانة
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="d-flex justify-content-between mb-3">
+        <a href="{{ url_for('devices') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> العودة إلى قائمة الأجهزة
+        </a>
+        {% if prev_device %}
+        <a href="{{ url_for('device_details', device_id=prev_device.id) }}" class="btn btn-outline-primary">
+            <i class="fas fa-chevron-right me-1"></i> الجهاز السابق: {{ prev_device.name }}
+        </a>
+        {% endif %}
+        {% if next_device %}
+        <a href="{{ url_for('device_details', device_id=next_device.id) }}" class="btn btn-outline-primary">
+            الجهاز التالي: {{ next_device.name }} <i class="fas fa-chevron-left ms-1"></i>
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Initialize tooltips -->
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

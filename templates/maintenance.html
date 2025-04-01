@@ -1,0 +1,265 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Header Section with Stats -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-0"><i class="fas fa-tools me-2 text-warning"></i>سجلات الصيانة</h2>
+                            <p class="text-muted mb-0">إدارة وعرض جميع سجلات الصيانة في النظام</p>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('export_maintenance_excel') }}" class="btn btn-success">
+                                <i class="fas fa-file-excel me-1"></i> تصدير إلى Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row mb-3">
+        <div class="col-md-3 mb-2">
+            <div class="card shadow-sm border-start border-primary border-4 h-100">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">إجمالي السجلات</h6>
+                            <h3 class="mb-0" id="total-records">{{ maintenance_records|length }}</h3>
+                        </div>
+                        <div class="bg-light rounded-circle p-2">
+                            <i class="fas fa-clipboard-list fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-2">
+            <div class="card shadow-sm border-start border-success border-4 h-100">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">مكتمل</h6>
+                            <h3 class="mb-0" id="completed-records">0</h3>
+                        </div>
+                        <div class="bg-light rounded-circle p-2">
+                            <i class="fas fa-check-circle fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-2">
+            <div class="card shadow-sm border-start border-warning border-4 h-100">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">قيد التنفيذ</h6>
+                            <h3 class="mb-0" id="in-progress-records">0</h3>
+                        </div>
+                        <div class="bg-light rounded-circle p-2">
+                            <i class="fas fa-cog fa-spin fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-2">
+            <div class="card shadow-sm border-start border-danger border-4 h-100">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">قيد الانتظار</h6>
+                            <h3 class="mb-0" id="pending-records">0</h3>
+                        </div>
+                        <div class="bg-light rounded-circle p-2">
+                            <i class="fas fa-clock fa-2x text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Filter Card -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white py-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>تصفية وبحث</h5>
+                <button class="btn btn-sm btn-outline-secondary" id="reset-filters">
+                    <i class="fas fa-redo me-1"></i>إعادة تعيين
+                </button>
+            </div>
+        </div>
+        <div class="card-body py-2">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <label for="status-filter" class="form-label small">الحالة</label>
+                    <select id="status-filter" class="form-select form-select-sm">
+                        <option value="">جميع الحالات</option>
+                        <option value="قيد الانتظار">قيد الانتظار</option>
+                        <option value="قيد التنفيذ">قيد التنفيذ</option>
+                        <option value="مكتمل">مكتمل</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="technician-filter" class="form-label small">الفني</label>
+                    <select id="technician-filter" class="form-select form-select-sm">
+                        <option value="">جميع الفنيين</option>
+                        {% set technicians = [] %}
+                        {% for record in maintenance_records %}
+                            {% if record.technician and record.technician not in technicians %}
+                                {% set _ = technicians.append(record.technician) %}
+                                <option value="{{ record.technician }}">{{ record.technician }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="date-filter" class="form-label small">تاريخ الصيانة</label>
+                    <input type="date" id="date-filter" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-3">
+                    <label for="search-input" class="form-label small">بحث</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" id="search-input" class="form-control" placeholder="بحث بالجهاز أو المشكلة...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Records Table Card -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm mb-0" id="maintenance-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0">#</th>
+                            <th class="border-0">الجهاز</th>
+                            <th class="border-0">تاريخ الصيانة</th>
+                            <th class="border-0">وصف المشكلة</th>
+                            <th class="border-0">الحالة</th>
+                            <th class="border-0">الفني</th>
+                            <th class="border-0">تاريخ الإكمال</th>
+                            <th class="border-0 text-center">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in maintenance_records %}
+                        <tr data-status="{{ record.status }}" data-technician="{{ record.technician }}" data-date="{{ record.maintenance_date.strftime('%Y-%m-%d') }}">
+                            <td>{{ record.id }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if record.device.type == 'حاسوب مكتبي' %}
+                                        <i class="fas fa-desktop text-primary me-1"></i>
+                                    {% elif record.device.type == 'حاسوب محمول' %}
+                                        <i class="fas fa-laptop text-primary me-1"></i>
+                                    {% elif record.device.type == 'طابعة' %}
+                                        <i class="fas fa-print text-primary me-1"></i>
+                                    {% else %}
+                                        <i class="fas fa-hdd text-primary me-1"></i>
+                                    {% endif %}
+                                    <a href="{{ url_for('device_details', device_id=record.device_id) }}" class="text-decoration-none small">
+                                        {{ record.device.name }}
+                                    </a>
+                                </div>
+                            </td>
+                            <td class="small">{{ record.maintenance_date.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <span class="d-inline-block text-truncate small" style="max-width: 200px;" data-bs-toggle="tooltip" title="{{ record.issue_description }}">
+                                    {{ record.issue_description }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if record.status == 'مكتمل' %}
+                                    <span class="badge bg-success">{{ record.status }}</span>
+                                {% elif record.status == 'قيد التنفيذ' %}
+                                    <span class="badge bg-warning text-dark">{{ record.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ record.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="small">
+                                <i class="fas fa-user-cog me-1 text-muted"></i>
+                                {{ record.technician }}
+                            </td>
+                            <td class="small">
+                                {% if record.completion_date %}
+                                    <i class="fas fa-calendar-check me-1 text-success"></i>
+                                    {{ record.completion_date.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    <i class="fas fa-hourglass-half me-1 text-warning"></i>
+                                    غير مكتمل
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="{{ url_for('edit_maintenance', record_id=record.id) }}" class="btn btn-sm btn-outline-warning me-1 py-0 px-1" data-bs-toggle="tooltip" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('print_maintenance', record_id=record.id) }}" class="btn btn-sm btn-outline-info py-0 px-1" target="_blank" data-bs-toggle="tooltip" title="طباعة">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                    <!-- PDF export button removed -->
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="text-center py-4 d-none">
+                <img src="https://cdn-icons-png.flaticon.com/512/5058/5058432.png" alt="No maintenance records" style="width: 100px; opacity: 0.5;" class="mb-2">
+                <h6 class="text-muted">لا توجد سجلات صيانة مطابقة للبحث</h6>
+                <p class="text-muted small">حاول تغيير معايير البحث أو <button id="clear-filters" class="btn btn-link p-0 small">إعادة تعيين الفلاتر</button></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/table-filters.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize table filter
+        const maintenanceFilter = new TableFilter({
+            tableId: 'maintenance-table',
+            emptyStateId: 'empty-state',
+            filterSelectors: {
+                status: '#status-filter',
+                technician: '#technician-filter',
+                date: '#date-filter'
+            },
+            dataAttributes: ['status', 'technician', 'date'],
+            statsCounters: {
+                completed: {
+                    elementId: 'completed-records',
+                    dataAttr: 'status',
+                    value: 'مكتمل'
+                },
+                inProgress: {
+                    elementId: 'in-progress-records',
+                    dataAttr: 'status',
+                    value: 'قيد التنفيذ'
+                },
+                pending: {
+                    elementId: 'pending-records',
+                    dataAttr: 'status',
+                    value: 'قيد الانتظار'
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

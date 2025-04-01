@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-warning text-white py-2">
+        <h4 class="mb-0"><i class="fas fa-tools me-2"></i>تعديل سجل الصيانة</h4>
+    </div>
+    <div class="card-body p-3">
+        <div class="alert alert-info py-2">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-laptop-medical me-3 fs-4"></i>
+                <div>
+                    <h6 class="mb-1">معلومات الجهاز:</h6>
+                    <p class="small mb-0"><strong>{{ maintenance_record.device.name }}</strong> | {{ maintenance_record.device.type }} | {{ maintenance_record.device.serial_number }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <form method="POST" action="{{ url_for('edit_maintenance', record_id=maintenance_record.id) }}">
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <label for="maintenance_date" class="form-label small">تاريخ الصيانة</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        <input type="date" class="form-control form-control-sm" id="maintenance_date" name="maintenance_date" value="{{ maintenance_record.maintenance_date.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label for="status" class="form-label small">الحالة</label>
+                    <select class="form-select form-select-sm" id="status" name="status" required>
+                        <option value="قيد الانتظار" {% if maintenance_record.status == 'قيد الانتظار' %}selected{% endif %}>قيد الانتظار</option>
+                        <option value="قيد التنفيذ" {% if maintenance_record.status == 'قيد التنفيذ' %}selected{% endif %}>قيد التنفيذ</option>
+                        <option value="مكتمل" {% if maintenance_record.status == 'مكتمل' %}selected{% endif %}>مكتمل</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mb-2">
+                <label for="issue_description" class="form-label small">وصف المشكلة</label>
+                <textarea class="form-control form-control-sm" id="issue_description" name="issue_description" rows="2" required>{{ maintenance_record.issue_description }}</textarea>
+            </div>
+            
+            <div class="mb-2">
+                <label for="technician" class="form-label small">الفني المسؤول</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="fas fa-user-cog"></i></span>
+                    <input type="text" class="form-control form-control-sm" id="technician" name="technician" value="{{ maintenance_record.technician }}" required>
+                </div>
+            </div>
+            
+            <div class="mb-2">
+                <label for="solution" class="form-label small">الحل / الإجراءات المتخذة</label>
+                <textarea class="form-control form-control-sm" id="solution" name="solution" rows="2">{{ maintenance_record.solution }}</textarea>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                <a href="{{ url_for('device_details', device_id=maintenance_record.device_id) }}" class="btn btn-sm btn-outline-secondary me-md-2">
+                    <i class="fas fa-times me-1"></i>إلغاء
+                </a>
+                <button type="submit" class="btn btn-sm btn-warning">
+                    <i class="fas fa-save me-1"></i>حفظ التغييرات
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

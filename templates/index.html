@@ -1,0 +1,244 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="dashboard-header animate__animated animate__fadeIn">
+    <h3 class="mb-3"><i class="fas fa-tachometer-alt me-2"></i>لوحة التحكم</h3>
+    <p class="text-muted small">مرحبًا بك في نظام إدارة الأجهزة</p>
+</div>
+
+<!-- بطاقات الإحصائيات مع تأثيرات حركية - صف واحد -->
+<div class="row mb-3">
+    <!-- إحصائيات الأجهزة -->
+    <div class="col-md-2 mb-3">
+        <div class="card stats-card bg-primary text-white interactive-card animate__animated animate__fadeInUp">
+            <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title small">إجمالي الأجهزة</h6>
+                        <h4 class="counter mb-0">{{ total_devices }}</h4>
+                    </div>
+                    <i class="fas fa-laptop stats-icon fa-2x"></i>
+                </div>
+            </div>
+            <a href="{{ url_for('devices') }}" class="card-footer py-1 text-white d-flex justify-content-between align-items-center">
+                <span class="small">عرض</span>
+                <i class="fas fa-arrow-circle-left"></i>
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-2 mb-3">
+        <div class="card stats-card bg-success text-white interactive-card animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+            <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title small">الأجهزة الفعالة</h6>
+                        <h4 class="counter mb-0">{{ active_devices }}</h4>
+                    </div>
+                    <i class="fas fa-check-circle stats-icon fa-2x"></i>
+                </div>
+            </div>
+            <a href="{{ url_for('devices') }}?status=فعال" class="card-footer py-1 text-white d-flex justify-content-between align-items-center">
+                <span class="small">عرض</span>
+                <i class="fas fa-arrow-circle-left"></i>
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-2 mb-3">
+        <div class="card stats-card bg-warning text-white interactive-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+            <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title small">قيد الصيانة</h6>
+                        <h4 class="counter mb-0">{{ maintenance_devices }}</h4>
+                    </div>
+                    <i class="fas fa-tools stats-icon fa-2x"></i>
+                </div>
+            </div>
+            <a href="{{ url_for('devices') }}?status=قيد الصيانة" class="card-footer py-1 text-white d-flex justify-content-between align-items-center">
+                <span class="small">عرض</span>
+                <i class="fas fa-arrow-circle-left"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- إحصائيات الصيانة -->
+    <div class="col-md-2 mb-3">
+        <div class="card stats-card bg-info text-white interactive-card animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+            <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title small">إجمالي الصيانة</h6>
+                        <h4 class="counter mb-0">{{ total_maintenance }}</h4>
+                    </div>
+                    <i class="fas fa-clipboard-list stats-icon fa-2x"></i>
+                </div>
+            </div>
+            <a href="{{ url_for('maintenance') }}" class="card-footer py-1 text-white d-flex justify-content-between align-items-center">
+                <span class="small">عرض</span>
+                <i class="fas fa-arrow-circle-left"></i>
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-2 mb-3">
+        <div class="card stats-card bg-danger text-white interactive-card animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+            <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title small">قيد الانتظار</h6>
+                        <h4 class="counter mb-0">{{ pending_maintenance }}</h4>
+                    </div>
+                    <i class="fas fa-clock stats-icon fa-2x"></i>
+                </div>
+            </div>
+            <a href="{{ url_for('maintenance') }}?status=قيد الانتظار" class="card-footer py-1 text-white d-flex justify-content-between align-items-center">
+                <span class="small">عرض</span>
+                <i class="fas fa-arrow-circle-left"></i>
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-2 mb-3">
+        <div class="card stats-card bg-secondary text-white interactive-card animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
+            <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title small">مكتملة</h6>
+                        <h4 class="counter mb-0">{{ completed_maintenance }}</h4>
+                    </div>
+                    <i class="fas fa-check-double stats-icon fa-2x"></i>
+                </div>
+            </div>
+            <a href="{{ url_for('maintenance') }}?status=مكتمل" class="card-footer py-1 text-white d-flex justify-content-between align-items-center">
+                <span class="small">عرض</span>
+                <i class="fas fa-arrow-circle-left"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- روابط سريعة -->
+<div class="row mb-3 animate__animated animate__fadeIn" style="animation-delay: 0.6s;">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body p-2">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('add_device') }}" class="btn btn-sm btn-primary btn-interactive">
+                        <i class="fas fa-plus-circle me-1"></i> إضافة جهاز
+                    </a>
+                    <a href="{{ url_for('devices') }}" class="btn btn-sm btn-success btn-interactive">
+                        <i class="fas fa-laptop me-1"></i> الأجهزة
+                    </a>
+                    <a href="{{ url_for('maintenance') }}" class="btn btn-sm btn-info text-white btn-interactive">
+                        <i class="fas fa-tools me-1"></i> الصيانة
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- أحدث الأجهزة -->
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm animate__animated animate__fadeInUp" style="animation-delay: 0.7s;">
+            <div class="card-header bg-primary text-white py-2 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="fas fa-laptop me-2"></i>أحدث الأجهزة</h6>
+                <a href="{{ url_for('devices') }}" class="btn btn-sm btn-light py-0 px-2">عرض الكل</a>
+            </div>
+            <div class="card-body p-0">
+                {% if latest_devices %}
+                <div class="list-group list-group-flush">
+                    {% for device in latest_devices %}
+                    <a href="{{ url_for('device_details', device_id=device.id) }}" class="list-group-item list-group-item-action py-2">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-0">{{ device.name }}</h6>
+                            <span class="badge bg-{{ 'success' if device.status == 'فعال' else 'warning' if device.status == 'قيد الصيانة' else 'danger' }}">{{ device.status }}</span>
+                        </div>
+                        <small class="text-muted">{{ device.type }} - {{ device.serial_number }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-3">
+                    <p class="text-muted small mb-0">لا توجد أجهزة مضافة بعد.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- أحدث سجلات الصيانة -->
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm animate__animated animate__fadeInUp" style="animation-delay: 0.8s;">
+            <div class="card-header bg-info text-white py-2 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="fas fa-tools me-2"></i>أحدث سجلات الصيانة</h6>
+                <a href="{{ url_for('maintenance') }}" class="btn btn-sm btn-light py-0 px-2">عرض الكل</a>
+            </div>
+            <div class="card-body p-0">
+                {% if latest_maintenance %}
+                <div class="list-group list-group-flush">
+                    {% for record in latest_maintenance %}
+                    <a href="{{ url_for('device_details', device_id=record.device_id) }}" class="list-group-item list-group-item-action py-2">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-0">{{ record.device.name }}</h6>
+                            <span class="badge bg-{{ 'warning' if record.status == 'قيد الانتظار' else 'primary' if record.status == 'قيد التنفيذ' else 'success' }}">{{ record.status }}</span>
+                        </div>
+                        <small class="text-muted">{{ record.issue_description[:40] }}{% if record.issue_description|length > 40 %}...{% endif %}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-3">
+                    <p class="text-muted small mb-0">لا توجد سجلات صيانة مضافة بعد.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // تأثير العداد للأرقام
+    document.addEventListener('DOMContentLoaded', function() {
+        const counters = document.querySelectorAll('.counter');
+        const speed = 200;
+        
+        counters.forEach(counter => {
+            const target = +counter.innerText;
+            const inc = target / speed;
+            
+            let count = 0;
+            const updateCount = () => {
+                if(count < target) {
+                    count += inc;
+                    counter.innerText = Math.ceil(count);
+                    setTimeout(updateCount, 1);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            
+            updateCount();
+        });
+        
+        // تفعيل البطاقات التفاعلية
+        const cards = document.querySelectorAll('.interactive-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.classList.add('shadow-sm');
+                this.style.transform = 'translateY(-3px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.classList.remove('shadow-sm');
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
+{% endblock %}
