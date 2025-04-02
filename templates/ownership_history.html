@@ -12,7 +12,6 @@
         </ol>
     </nav>
 
-    <!-- Header -->
     <div class="card shadow-sm border-0 bg-gradient-primary text-white mb-4">
         <div class="card-body py-3">
             <div class="d-flex justify-content-between align-items-center">
@@ -21,7 +20,6 @@
                     <p class="mb-0 opacity-75">{{ device.name }} ({{ device.serial_number }})</p>
                 </div>
                 <div class="d-flex">
-                    <!-- Add Export Button -->
                     <a href="{{ url_for('export_ownership_history', device_id=device.id) }}" class="btn btn-success me-2">
                         <i class="fas fa-file-excel me-1"></i> Exporter
                     </a>
@@ -32,8 +30,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Ownership History Table -->
     <div class="card border-0 shadow-sm">
         <div class="card-body">
             {% if ownership_changes %}

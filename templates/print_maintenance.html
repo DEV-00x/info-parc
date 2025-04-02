@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fiche de Maintenance #{{ record.id }}</title>
+    <title>Fiche de Maintenance /  {{ record.id }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- Add QR Code library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <style>
         body {
@@ -110,7 +109,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             margin-left: 10px;
         }
-        /* QR Code styles */
+        
         .qr-code {
             position: absolute;
             top: 0;
@@ -121,7 +120,7 @@
             align-items: center;
             justify-content: center;
         }
-        /* Signature section styles */
+    
         .signatures {
             margin-top: 40px;
             display: flex;
@@ -198,26 +197,16 @@
 </head>
 <body>
     <div class="container bg-white p-4 rounded shadow-sm">
-        <div class="header">
-            <div class="logo">
-                <i class="fas fa-laptop-medical"></i>
-            </div>
-            <!-- QR Code will be placed here -->
-            <div id="qrcode" class="qr-code"></div>
-            
-            <h2>Fiche de Maintenance #{{ record.id }}</h2>
-            <div class="reference">
-                <i class="fas fa-hashtag me-1"></i>
-                <span style="font-size: 1.2em; font-weight: bold;">
-                    {{ record.id }}/INFO/{{ record.maintenance_date.strftime('%Y') }}
-                </span>
-            </div>
-            <p>Date d'impression: {{ now().strftime('%d/%m/%Y %H:%M') }}</p>
+        <div class="header" style="text-align: center; padding: 20px; border-bottom: 3px solid #004080; background-color: #f8f9fa;">
+            <h2 style="color: #004080; margin-bottom: 5px;">Entreprise Publique des Travaux Routiers du Centre</h2>
+            <h3 style="color: #666; margin-bottom: 10px;">Direction de l'Administration et du Personnel</h3>
+            <p style="font-size: 18px; font-weight: bold; color: #333;">Fiche de Maintenance : <span style="color: #d9534f;">{{ record.id }}</span></p>
         </div>
+        
         
         <div class="device-info">
             <div class="section-header">
-                <i class="fas fa-laptop me-2"></i>Informations de l'Appareil
+                <i class="fas fa-laptop me-2"></i>    Informations de l'Appareil
             </div>
             <table class="table table-bordered">
                 <tr>
@@ -232,7 +221,7 @@
                         {% else %}
                             <i class="fas fa-hdd me-1"></i>
                         {% endif %}
-                        {{ record.device.type }}
+                         {{ record.device.type }}
                     </td>
                 </tr>
                 <tr>
@@ -252,15 +241,15 @@
                 {% if record.device.assigned_to %}
                 <tr>
                     <th>Assigné à</th>
-                    <td><i class="fas fa-user me-1"></i>{{ record.device.assigned_to }}</td>
+                    <td><i class="fas fa-user me-1"></i>   {{ record.device.assigned_to }}</td>
                     <th>Service</th>
-                    <td>{% if record.device.service %}<i class="fas fa-building me-1"></i>{{ record.device.service }}{% endif %}</td>
+                    <td>{% if record.device.service %}<i class="fas fa-building me-1"></i>   {{ record.device.service }}{% endif %}</td>
                 </tr>
                 {% endif %}
                 {% if record.device.department %}
                 <tr>
                     <th>Département</th>
-                    <td colspan="3"><i class="fas fa-sitemap me-1"></i>{{ record.device.department }}</td>
+                    <td colspan="3"><i class="fas fa-sitemap me-1"></i>    {{ record.device.department }}</td>
                 </tr>
                 {% endif %}
             </table>
@@ -268,31 +257,30 @@
         
         <div class="maintenance-info">
             <div class="section-header">
-                <i class="fas fa-tools me-2"></i>Détails de la Maintenance
+                <i class="fas fa-tools me-2"></i>     Détails de la Maintenance
             </div>
             <table class="table table-bordered">
                 <tr>
                     <th>Référence</th>
                     <td colspan="3">
                         <span style="font-weight: bold; color: #0d6efd;">
-                            <i class="fas fa-hashtag me-1"></i>
-                            {{ record.id }}/INFO/{{ record.maintenance_date.strftime('%Y') }}
+                            {{ record.reference or 'MAINT-' + record.id|string }}
                         </span>
                     </td>
                 </tr>
                 <tr>
                     <th>Date</th>
-                    <td><i class="far fa-calendar-alt me-1"></i>{{ record.maintenance_date.strftime('%d/%m/%Y') }}</td>
+                    <td><i class="far fa-calendar-alt me-1"></i>    {{ record.maintenance_date.strftime('%d/%m/%Y') }}</td>
                     <th>Statut</th>
                     <td>
                         {% if record.status == 'en attente' %}
-                            <span class="status-badge status-en-attente">{{ record.status }}</span>
+                            <span class="status-badge status-en-attente">   {{ record.status }}</span>
                         {% elif record.status == 'en cours' %}
-                            <span class="status-badge status-en-cours">{{ record.status }}</span>
+                            <span class="status-badge status-en-cours">   {{ record.status }}</span>
                         {% elif record.status == 'terminé' %}
-                            <span class="status-badge status-termine">{{ record.status }}</span>
+                            <span class="status-badge status-termine">   {{ record.status }}</span>
                         {% else %}
-                            <span class="status-badge">{{ record.status }}</span>
+                            <span class="status-badge">    {{ record.status }}</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -324,26 +312,29 @@
                 {% endif %}
             </table>
         </div>
-        
-        <!-- Signature section -->
         <div class="signatures">
             <div class="signature-box">
-                <div class="signature-title"><i class="fas fa-user me-1"></i>Signature du Propriétaire</div>
-                <div class="signature-name">{{ record.device.assigned_to or 'Non assigné' }}</div>
+                <div class="signature-title"><i class="fas fa-user me-1"></i>   Signature du Propriétaire</div>
+                <div class="signature-name">   {{ record.device.assigned_to or 'Non assigné' }}</div>
                 <div class="signature-date">Date: ___________________</div>
             </div>
             
             <div class="signature-box">
-                <div class="signature-title"><i class="fas fa-user-cog me-1"></i>Signature du Technicien</div>
-                <div class="signature-name">{{ record.technician }}</div>
+                <div class="signature-title"><i class="fas fa-user-cog me-1"></i>   Signature du Technicien</div>
+                <div class="signature-name">    {{ record.technician }}</div>
                 <div class="signature-date">Date: ___________________</div>
             </div>
         </div>
         
-        <div class="footer">
-            <p><i class="fas fa-info-circle me-1"></i>Ce document est généré automatiquement par le système de gestion informatique.</p>
-            <p>EPTRC © 2025 - Informatique Parc v2.0.1</p>
-        </div>
+        <footer class="footer py-3 mt-auto">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-primary">INFORMATIQUE SERVICE</span>
+                    <span class="text-muted">EPTRC © 2025 </span>
+                    <span class="badge bg-primary">Version 2.0.1</span>
+                </div>
+            </div>
+        </footer>
     </div>
     
     <div class="btn-controls no-print">
@@ -358,7 +349,6 @@
     <script>
         // Generate QR Code
         window.onload = function() {
-            // Create QR code with maintenance record information
             var qrText = "Référence: {{ record.id }}/INFO/{{ record.maintenance_date.strftime('%Y') }}\n" +
                          "ID: {{ record.id }}\n" +
                          "Appareil: {{ record.device.name }}\n" +
@@ -374,7 +364,7 @@
             
             document.getElementById('qrcode').innerHTML = qr.createImgTag(3);
             
-            // Wait a moment for the page to fully render before printing
+            
             setTimeout(function() {
                 window.print();
             }, 800);
