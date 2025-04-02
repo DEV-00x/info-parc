@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('devices') }}">Appareils</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('device_details', device_id=device.id) }}">{{ device.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Historique des Propriétaires</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="card shadow-sm border-0 bg-gradient-primary text-white mb-4">
+        <div class="card-body py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>Historique des Propriétaires</h2>
+                    <p class="mb-0 opacity-75">{{ device.name }} ({{ device.serial_number }})</p>
+                </div>
+                <div class="d-flex">
+                    <!-- Add Export Button -->
+                    <a href="{{ url_for('export_ownership_history', device_id=device.id) }}" class="btn btn-success me-2">
+                        <i class="fas fa-file-excel me-1"></i> Exporter
+                    </a>
+                    <a href="{{ url_for('device_details', device_id=device.id) }}" class="btn btn-light">
+                        <i class="fas fa-arrow-left me-1"></i> Retour à l'Appareil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ownership History Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            {% if ownership_changes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Ancien Propriétaire</th>
+                                <th>Nouveau Propriétaire</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for change in ownership_changes %}
+                            <tr>
+                                <td>{{ change.id }}</td>
+                                <td>{{ change.change_date.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>{{ change.previous_owner }}</td>
+                                <td>{{ change.new_owner }}</td>
+                                <td>{{ change.notes }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i> Aucun changement de propriétaire enregistré pour cet appareil.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

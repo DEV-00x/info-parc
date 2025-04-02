@@ -1,176 +1,384 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تقرير صيانة - {{ maintenance_record.id }}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <title>Fiche de Maintenance #{{ record.id }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Add QR Code library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            color: #333;
+            background-color: #f8f9fa;
         }
-        .report-header {
+        .header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 20px;
+            border-bottom: 2px solid #0d6efd;
+            padding-bottom: 15px;
+            position: relative;
         }
-        .report-title {
-            font-size: 24px;
+        .logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #0d6efd;
+        }
+        .reference {
+            font-size: 1.5rem;
+            color: #0d6efd;
             font-weight: bold;
             margin-bottom: 10px;
+            padding: 5px 10px;
+            border: 2px solid #0d6efd;
+            display: inline-block;
+            border-radius: 5px;
         }
-        .report-subtitle {
-            font-size: 18px;
-            color: #666;
-        }
-        .report-info {
+        .maintenance-info, .device-info {
             margin-bottom: 30px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border-radius: 0.5rem;
+            overflow: hidden;
         }
-        .report-section {
-            margin-bottom: 30px;
+        .section-header {
+            background-color: #f1f8ff;
+            padding: 10px 15px;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+            color: #0d6efd;
         }
-        .report-section-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
         }
-        .signature-section {
+        table, th, td {
+            border: 1px solid #dee2e6;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            width: 25%;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+        .footer {
             margin-top: 50px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .status-en-attente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-en-cours {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .status-termine {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .btn-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .btn-controls .btn {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            margin-left: 10px;
+        }
+        /* QR Code styles */
+        .qr-code {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Signature section styles */
+        .signatures {
+            margin-top: 40px;
             display: flex;
             justify-content: space-between;
         }
         .signature-box {
-            border-top: 1px solid #333;
-            width: 200px;
-            text-align: center;
+            width: 45%;
+            border-top: 1px dashed #aaa;
             padding-top: 10px;
+            text-align: center;
+        }
+        .signature-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .signature-name {
+            font-style: italic;
+        }
+        .signature-date {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
         }
         @media print {
             .no-print {
-                display: none;
+                display: none !important;
             }
             body {
+                padding: 0;
+                margin: 0;
+                background-color: white;
+            }
+            .container {
+                width: 100%;
+                max-width: 100%;
                 padding: 20px;
+            }
+            .maintenance-info, .device-info {
+                box-shadow: none;
+                border: 1px solid #dee2e6;
+            }
+            .header {
+                border-bottom: 2px solid #000;
+            }
+            .reference {
+                border: 2px solid #000;
+                color: #000;
+            }
+            .section-header {
+                background-color: #f1f1f1 !important;
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            th {
+                background-color: #f8f8f8 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .status-badge {
+                border: 1px solid #000;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            a {
+                text-decoration: none !important;
+                color: #000 !important;
+            }
+            .signatures {
+                page-break-inside: avoid;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <div class="no-print mb-4">
-            <button class="btn btn-primary" onclick="window.print()">
-                <i class="fas fa-print"></i> طباعة التقرير
-            </button>
-            <a href="{{ url_for('device_details', device_id=device.id) }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> العودة
-            </a>
-        </div>
-        
-        <div class="report-header">
-            <div class="report-title">تقرير صيانة الأجهزة</div>
-            <div class="report-subtitle">مصلحة الإعلام الآلي</div>
-        </div>
-        
-        <div class="report-info">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="report-section">
-                        <div class="report-section-title">معلومات الجهاز</div>
-                        <table class="table table-bordered">
-                            <tr>
-                                <th style="width: 30%">اسم الجهاز</th>
-                                <td>{{ device.name }}</td>
-                            </tr>
-                            <tr>
-                                <th>النوع</th>
-                                <td>{{ device.type }}</td>
-                            </tr>
-                            <tr>
-                                <th>الرقم التسلسلي</th>
-                                <td>{{ device.serial_number }}</td>
-                            </tr>
-                            <tr>
-                                <th>الموقع</th>
-                                <td>{{ device.location }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="report-section">
-                        <div class="report-section-title">معلومات الصيانة</div>
-                        <table class="table table-bordered">
-                            <tr>
-                                <th style="width: 30%">رقم الصيانة</th>
-                                <td>{{ maintenance_record.id }}</td>
-                            </tr>
-                            <tr>
-                                <th>تاريخ الصيانة</th>
-                                <td>{{ maintenance_record.maintenance_date.strftime('%Y-%m-%d') }}</td>
-                            </tr>
-                            <tr>
-                                <th>الحالة</th>
-                                <td>{{ maintenance_record.status }}</td>
-                            </tr>
-                            <tr>
-                                <th>الفني المسؤول</th>
-                                <td>{{ maintenance_record.technician }}</td>
-                            </tr>
-                            {% if maintenance_record.completion_date %}
-                            <tr>
-                                <th>تاريخ الإكمال</th>
-                                <td>{{ maintenance_record.completion_date.strftime('%Y-%m-%d') }}</td>
-                            </tr>
-                            {% endif %}
-                            {% if maintenance_record.cost %}
-                            <tr>
-                                <th>التكلفة</th>
-                                <td>{{ maintenance_record.cost }} دج</td>
-                            </tr>
-                            {% endif %}
-                        </table>
-                    </div>
-                </div>
+    <div class="container bg-white p-4 rounded shadow-sm">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-laptop-medical"></i>
             </div>
-        </div>
-        
-        <div class="report-section">
-            <div class="report-section-title">وصف المشكلة</div>
-            <div class="p-3 bg-light rounded">
-                {{ maintenance_record.issue_description }}
+            <!-- QR Code will be placed here -->
+            <div id="qrcode" class="qr-code"></div>
+            
+            <h2>Fiche de Maintenance #{{ record.id }}</h2>
+            <div class="reference">
+                <i class="fas fa-hashtag me-1"></i>
+                <span style="font-size: 1.2em; font-weight: bold;">
+                    {{ record.id }}/INFO/{{ record.maintenance_date.strftime('%Y') }}
+                </span>
             </div>
+            <p>Date d'impression: {{ now().strftime('%d/%m/%Y %H:%M') }}</p>
         </div>
         
-        {% if maintenance_record.solution %}
-        <div class="report-section">
-            <div class="report-section-title">الحل / الإجراءات المتخذة</div>
-            <div class="p-3 bg-light rounded">
-                {{ maintenance_record.solution }}
+        <div class="device-info">
+            <div class="section-header">
+                <i class="fas fa-laptop me-2"></i>Informations de l'Appareil
             </div>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Nom</th>
+                    <td>{{ record.device.name }}</td>
+                    <th>Type</th>
+                    <td>
+                        {% if record.device.type == 'ordinateur de bureau' %}
+                            <i class="fas fa-desktop me-1"></i>
+                        {% elif record.device.type == 'ordinateur portable' %}
+                            <i class="fas fa-laptop me-1"></i>
+                        {% else %}
+                            <i class="fas fa-hdd me-1"></i>
+                        {% endif %}
+                        {{ record.device.type }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Numéro de série</th>
+                    <td>{{ record.device.serial_number }}</td>
+                    <th>Statut</th>
+                    <td>
+                        {% if record.device.status == 'actif' %}
+                            <span class="badge bg-success">{{ record.device.status }}</span>
+                        {% elif record.device.status == 'en maintenance' %}
+                            <span class="badge bg-warning">{{ record.device.status }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ record.device.status }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if record.device.assigned_to %}
+                <tr>
+                    <th>Assigné à</th>
+                    <td><i class="fas fa-user me-1"></i>{{ record.device.assigned_to }}</td>
+                    <th>Service</th>
+                    <td>{% if record.device.service %}<i class="fas fa-building me-1"></i>{{ record.device.service }}{% endif %}</td>
+                </tr>
+                {% endif %}
+                {% if record.device.department %}
+                <tr>
+                    <th>Département</th>
+                    <td colspan="3"><i class="fas fa-sitemap me-1"></i>{{ record.device.department }}</td>
+                </tr>
+                {% endif %}
+            </table>
         </div>
-        {% endif %}
         
-        <div class="signature-section">
+        <div class="maintenance-info">
+            <div class="section-header">
+                <i class="fas fa-tools me-2"></i>Détails de la Maintenance
+            </div>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Référence</th>
+                    <td colspan="3">
+                        <span style="font-weight: bold; color: #0d6efd;">
+                            <i class="fas fa-hashtag me-1"></i>
+                            {{ record.id }}/INFO/{{ record.maintenance_date.strftime('%Y') }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Date</th>
+                    <td><i class="far fa-calendar-alt me-1"></i>{{ record.maintenance_date.strftime('%d/%m/%Y') }}</td>
+                    <th>Statut</th>
+                    <td>
+                        {% if record.status == 'en attente' %}
+                            <span class="status-badge status-en-attente">{{ record.status }}</span>
+                        {% elif record.status == 'en cours' %}
+                            <span class="status-badge status-en-cours">{{ record.status }}</span>
+                        {% elif record.status == 'terminé' %}
+                            <span class="status-badge status-termine">{{ record.status }}</span>
+                        {% else %}
+                            <span class="status-badge">{{ record.status }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Description du problème</th>
+                    <td colspan="3">{{ record.issue_description }}</td>
+                </tr>
+                {% if record.actions_taken %}
+                <tr>
+                    <th>Actions effectuées</th>
+                    <td colspan="3">{{ record.actions_taken }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Technicien</th>
+                    <td colspan="3"><i class="fas fa-user-cog me-1"></i>{{ record.technician }}</td>
+                </tr>
+                {% if record.completion_date %}
+                <tr>
+                    <th>Date d'achèvement</th>
+                    <td colspan="3"><i class="far fa-calendar-check me-1"></i>{{ record.completion_date.strftime('%d/%m/%Y') }}</td>
+                </tr>
+                {% endif %}
+                {% if record.notes %}
+                <tr>
+                    <th>Notes</th>
+                    <td colspan="3"><i class="fas fa-sticky-note me-1"></i>{{ record.notes }}</td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+        
+        <!-- Signature section -->
+        <div class="signatures">
             <div class="signature-box">
-                <div>توقيع الفني</div>
-                <div>{{ maintenance_record.technician }}</div>
+                <div class="signature-title"><i class="fas fa-user me-1"></i>Signature du Propriétaire</div>
+                <div class="signature-name">{{ record.device.assigned_to or 'Non assigné' }}</div>
+                <div class="signature-date">Date: ___________________</div>
             </div>
+            
             <div class="signature-box">
-                <div>توقيع المسؤول</div>
-                <div>........................</div>
-            </div>
-            <div class="signature-box">
-                <div>توقيع المستلم</div>
-                <div>........................</div>
+                <div class="signature-title"><i class="fas fa-user-cog me-1"></i>Signature du Technicien</div>
+                <div class="signature-name">{{ record.technician }}</div>
+                <div class="signature-date">Date: ___________________</div>
             </div>
         </div>
         
-        <div class="text-center mt-5">
-            <p>تم إنشاء هذا التقرير بتاريخ: {{ now.strftime('%Y-%m-%d') }}</p>
+        <div class="footer">
+            <p><i class="fas fa-info-circle me-1"></i>Ce document est généré automatiquement par le système de gestion informatique.</p>
+            <p>EPTRC © 2025 - Informatique Parc v2.0.1</p>
         </div>
     </div>
+    
+    <div class="btn-controls no-print">
+        <button class="btn btn-primary" onclick="window.print()">
+            <i class="fas fa-print me-1"></i>Imprimer
+        </button>
+        <button class="btn btn-secondary" onclick="window.close()">
+            <i class="fas fa-times me-1"></i>Fermer
+        </button>
+    </div>
+
+    <script>
+        // Generate QR Code
+        window.onload = function() {
+            // Create QR code with maintenance record information
+            var qrText = "Référence: {{ record.id }}/INFO/{{ record.maintenance_date.strftime('%Y') }}\n" +
+                         "ID: {{ record.id }}\n" +
+                         "Appareil: {{ record.device.name }}\n" +
+                         "S/N: {{ record.device.serial_number }}\n" +
+                         "Date: {{ record.maintenance_date.strftime('%d/%m/%Y') }}\n" +
+                         "Technicien: {{ record.technician }}";
+            
+            var typeNumber = 4;
+            var errorCorrectionLevel = 'L';
+            var qr = qrcode(typeNumber, errorCorrectionLevel);
+            qr.addData(qrText);
+            qr.make();
+            
+            document.getElementById('qrcode').innerHTML = qr.createImgTag(3);
+            
+            // Wait a moment for the page to fully render before printing
+            setTimeout(function() {
+                window.print();
+            }, 800);
+        };
+    </script>
 </body>
 </html>

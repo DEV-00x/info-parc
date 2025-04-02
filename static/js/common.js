@@ -317,3 +317,194 @@ function initAllFunctions() {
 document.addEventListener('DOMContentLoaded', function() {
     initAllFunctions();
 });
+
+/**
+ * Confirmation dialog for delete actions
+ */
+function confirmDelete(event, message) {
+    if (!confirm(message)) {
+        event.preventDefault();
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Table Filter class for filtering and searching table data
+ */
+class TableFilter {
+    constructor(options) {
+        this.tableId = options.tableId;
+        this.emptyStateId = options.emptyStateId;
+        this.filterSelectors = options.filterSelectors || {};
+        this.searchSelector = options.searchSelector;
+        this.resetSelector = options.resetSelector;
+        this.dataAttributes = options.dataAttributes || [];
+        this.statsCounters = options.statsCounters || {};
+        
+        this.table = document.getElementById(this.tableId);
+        this.emptyState = document.getElementById(this.emptyStateId);
+        this.rows = this.table ? Array.from(this.table.querySelectorAll('tbody tr')) : [];
+        
+        this.initFilters();
+        this.initSearch();
+        this.initReset();
+        this.updateStats();
+    }
+    
+    initFilters() {
+        for (const [key, selector] of Object.entries(this.filterSelectors)) {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.addEventListener('change', () => this.applyFilters());
+            }
+        }
+    }
+    
+    initSearch() {
+        const searchInput = document.querySelector(this.searchSelector);
+        if (searchInput) {
+            searchInput.addEventListener('input', () => this.applyFilters());
+        }
+    }
+    
+    initReset() {
+        const resetButton = document.querySelector(this.resetSelector);
+        if (resetButton) {
+            resetButton.addEventListener('click', () => this.resetFilters());
+        }
+    }
+    
+    applyFilters() {
+        if (!this.table) return;
+        
+        const filters = {};
+        for (const [key, selector] of Object.entries(this.filterSelectors)) {
+            const element = document.querySelector(selector);
+            if (element) {
+                filters[key] = element.value.toLowerCase();
+            }
+        }
+        
+        const searchInput = document.querySelector(this.searchSelector);
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        
+        let visibleCount = 0;
+        
+        this.rows.forEach(row => {
+            let visible = true;
+            
+            // Apply data attribute filters
+            for (const [key, value] of Object.entries(filters)) {
+                if (value && this.dataAttributes.includes(key)) {
+                    const rowValue = row.getAttribute(`data-${key}`).toLowerCase();
+                    if (rowValue !== value) {
+                        visible = false;
+                    }
+                }
+            }
+            
+            // Apply search filter
+            if (visible && searchTerm) {
+                const rowText = row.textContent.toLowerCase();
+                if (!rowText.includes(searchTerm)) {
+                    visible = false;
+                }
+            }
+            
+            // Apply date filter if present
+            if (visible && filters.date && this.dataAttributes.includes('date')) {
+                const rowDate = row.getAttribute('data-date');
+                if (rowDate !== filters.date) {
+                    visible = false;
+                }
+            }
+            
+            row.style.display = visible ? '' : 'none';
+            if (visible) visibleCount++;
+        });
+        
+        // Show/hide empty state
+        if (this.emptyState) {
+            this.emptyState.classList.toggle('d-none', visibleCount > 0);
+        }
+        
+        this.updateStats();
+    }
+    
+    resetFilters() {
+        // Reset all filter inputs
+        for (const selector of Object.values(this.filterSelectors)) {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.value = '';
+            }
+        }
+        
+        // Reset search input
+        const searchInput = document.querySelector(this.searchSelector);
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        
+        // Show all rows
+        this.rows.forEach(row => {
+            row.style.display = '';
+        });
+        
+        // Hide empty state
+        if (this.emptyState) {
+            this.emptyState.classList.add('d-none');
+        }
+        
+        this.updateStats();
+    }
+    
+    updateStats() {
+        if (!this.statsCounters) return;
+        
+        // Count total visible rows
+        const totalVisible = this.rows.filter(row => row.style.display !== 'none').length;
+        
+        // Update total counter
+        if (this.statsCounters.total) {
+            const totalElement = document.getElementById(this.statsCounters.total);
+            if (totalElement) {
+                totalElement.textContent = totalVisible;
+            }
+        }
+        
+        // Count and update status-specific counters
+        const statusCounts = {
+            active: 0,
+            inactive: 0,
+            maintenance: 0,
+            pending: 0,
+            inProgress: 0,
+            completed: 0
+        };
+        
+        this.rows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const status = row.getAttribute('data-status');
+                
+                if (status === 'actif') statusCounts.active++;
+                else if (status === 'inactif') statusCounts.inactive++;
+                else if (status === 'en maintenance') statusCounts.maintenance++;
+                else if (status === 'en attente') statusCounts.pending++;
+                else if (status === 'en cours') statusCounts.inProgress++;
+                else if (status === 'terminé') statusCounts.completed++;
+            }
+        });
+        
+        // Update status counters
+        for (const [key, value] of Object.entries(statusCounts)) {
+            if (this.statsCounters[key]) {
+                const element = document.getElementById(this.statsCounters[key]);
+                if (element) {
+                    element.textContent = value;
+                }
+            }
+        }
+    }
+}

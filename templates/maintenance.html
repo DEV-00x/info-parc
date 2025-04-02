@@ -1,19 +1,20 @@
 {% extends "layout.html" %}
+
 {% block content %}
 <div class="container-fluid px-0">
     <!-- Header Section with Stats -->
     <div class="row mb-3">
         <div class="col-md-12">
-            <div class="card shadow-sm border-0 bg-light">
+            <div class="card shadow-sm border-0 bg-gradient-warning text-white">
                 <div class="card-body py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h2 class="mb-0"><i class="fas fa-tools me-2 text-warning"></i>سجلات الصيانة</h2>
-                            <p class="text-muted mb-0">إدارة وعرض جميع سجلات الصيانة في النظام</p>
+                            <h2 class="mb-0"><i class="fas fa-tools me-2"></i>Registres de Maintenance</h2>
+                            <p class="mb-0 opacity-75">Gérer et afficher tous les registres de maintenance du système</p>
                         </div>
                         <div>
-                            <a href="{{ url_for('export_maintenance_excel') }}" class="btn btn-success">
-                                <i class="fas fa-file-excel me-1"></i> تصدير إلى Excel
+                            <a href="{{ url_for('export_maintenance_excel') }}" class="btn btn-light">
+                                <i class="fas fa-file-excel me-1"></i> Exporter vers Excel
                             </a>
                         </div>
                     </div>
@@ -25,60 +26,60 @@
     <!-- Quick Stats Cards -->
     <div class="row mb-3">
         <div class="col-md-3 mb-2">
-            <div class="card shadow-sm border-start border-primary border-4 h-100">
-                <div class="card-body py-2">
+            <div class="card shadow-sm border-0 h-100 stats-card">
+                <div class="card-body py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">إجمالي السجلات</h6>
-                            <h3 class="mb-0" id="total-records">{{ maintenance_records|length }}</h3>
+                            <h6 class="text-muted mb-1">Total des Registres</h6>
+                            <h3 class="mb-0 fw-bold" id="total-records">{{ maintenance_records|length }}</h3>
                         </div>
-                        <div class="bg-light rounded-circle p-2">
-                            <i class="fas fa-clipboard-list fa-2x text-primary"></i>
+                        <div class="icon-circle bg-primary">
+                            <i class="fas fa-clipboard-list fa-lg text-white"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-2">
-            <div class="card shadow-sm border-start border-success border-4 h-100">
-                <div class="card-body py-2">
+            <div class="card shadow-sm border-0 h-100 stats-card">
+                <div class="card-body py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">مكتمل</h6>
-                            <h3 class="mb-0" id="completed-records">0</h3>
+                            <h6 class="text-muted mb-1">En Attente</h6>
+                            <h3 class="mb-0 fw-bold" id="pending-records">0</h3>
                         </div>
-                        <div class="bg-light rounded-circle p-2">
-                            <i class="fas fa-check-circle fa-2x text-success"></i>
+                        <div class="icon-circle bg-info">
+                            <i class="fas fa-clock fa-lg text-white"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-2">
-            <div class="card shadow-sm border-start border-warning border-4 h-100">
-                <div class="card-body py-2">
+            <div class="card shadow-sm border-0 h-100 stats-card">
+                <div class="card-body py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">قيد التنفيذ</h6>
-                            <h3 class="mb-0" id="in-progress-records">0</h3>
+                            <h6 class="text-muted mb-1">En Cours</h6>
+                            <h3 class="mb-0 fw-bold" id="in-progress-records">0</h3>
                         </div>
-                        <div class="bg-light rounded-circle p-2">
-                            <i class="fas fa-cog fa-spin fa-2x text-warning"></i>
+                        <div class="icon-circle bg-warning">
+                            <i class="fas fa-cog fa-lg text-white"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-2">
-            <div class="card shadow-sm border-start border-danger border-4 h-100">
-                <div class="card-body py-2">
+            <div class="card shadow-sm border-0 h-100 stats-card">
+                <div class="card-body py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">قيد الانتظار</h6>
-                            <h3 class="mb-0" id="pending-records">0</h3>
+                            <h6 class="text-muted mb-1">Terminés</h6>
+                            <h3 class="mb-0 fw-bold" id="completed-records">0</h3>
                         </div>
-                        <div class="bg-light rounded-circle p-2">
-                            <i class="fas fa-clock fa-2x text-danger"></i>
+                        <div class="icon-circle bg-success">
+                            <i class="fas fa-check-circle fa-lg text-white"></i>
                         </div>
                     </div>
                 </div>
@@ -86,31 +87,31 @@
         </div>
     </div>
 
-    <!-- Advanced Filter Card -->
+    <!-- Filters Card -->
     <div class="card shadow-sm mb-3">
         <div class="card-header bg-white py-2">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>تصفية وبحث</h5>
+                <h5 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Filtrer et Rechercher</h5>
                 <button class="btn btn-sm btn-outline-secondary" id="reset-filters">
-                    <i class="fas fa-redo me-1"></i>إعادة تعيين
+                    <i class="fas fa-redo me-1"></i>Réinitialiser
                 </button>
             </div>
         </div>
         <div class="card-body py-2">
             <div class="row g-2">
                 <div class="col-md-3">
-                    <label for="status-filter" class="form-label small">الحالة</label>
+                    <label for="status-filter" class="form-label small">Statut</label>
                     <select id="status-filter" class="form-select form-select-sm">
-                        <option value="">جميع الحالات</option>
-                        <option value="قيد الانتظار">قيد الانتظار</option>
-                        <option value="قيد التنفيذ">قيد التنفيذ</option>
-                        <option value="مكتمل">مكتمل</option>
+                        <option value="">Tous les Statuts</option>
+                        <option value="en attente">En Attente</option>
+                        <option value="en cours">En Cours</option>
+                        <option value="terminé">Terminé</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="technician-filter" class="form-label small">الفني</label>
+                    <label for="technician-filter" class="form-label small">Technicien</label>
                     <select id="technician-filter" class="form-select form-select-sm">
-                        <option value="">جميع الفنيين</option>
+                        <option value="">Tous les Techniciens</option>
                         {% set technicians = [] %}
                         {% for record in maintenance_records %}
                             {% if record.technician and record.technician not in technicians %}
@@ -121,14 +122,14 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="date-filter" class="form-label small">تاريخ الصيانة</label>
+                    <label for="date-filter" class="form-label small">Date de Maintenance</label>
                     <input type="date" id="date-filter" class="form-control form-control-sm">
                 </div>
                 <div class="col-md-3">
-                    <label for="search-input" class="form-label small">بحث</label>
+                    <label for="search-input" class="form-label small">Rechercher</label>
                     <div class="input-group input-group-sm">
                         <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" id="search-input" class="form-control" placeholder="بحث بالجهاز أو المشكلة...">
+                        <input type="text" id="search-input" class="form-control" placeholder="Rechercher par appareil ou problème...">
                     </div>
                 </div>
             </div>
@@ -143,13 +144,14 @@
                     <thead class="table-light">
                         <tr>
                             <th class="border-0">#</th>
-                            <th class="border-0">الجهاز</th>
-                            <th class="border-0">تاريخ الصيانة</th>
-                            <th class="border-0">وصف المشكلة</th>
-                            <th class="border-0">الحالة</th>
-                            <th class="border-0">الفني</th>
-                            <th class="border-0">تاريخ الإكمال</th>
-                            <th class="border-0 text-center">الإجراءات</th>
+                            <th class="border-0">Référence</th>
+                            <th class="border-0">Appareil</th>
+                            <th class="border-0">Date de Maintenance</th>
+                            <th class="border-0">Description du Problème</th>
+                            <th class="border-0">Statut</th>
+                            <th class="border-0">Technicien</th>
+                            <th class="border-0">Date d'Achèvement</th>
+                            <th class="border-0 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -157,59 +159,42 @@
                         <tr data-status="{{ record.status }}" data-technician="{{ record.technician }}" data-date="{{ record.maintenance_date.strftime('%Y-%m-%d') }}">
                             <td>{{ record.id }}</td>
                             <td>
-                                <div class="d-flex align-items-center">
-                                    {% if record.device.type == 'حاسوب مكتبي' %}
-                                        <i class="fas fa-desktop text-primary me-1"></i>
-                                    {% elif record.device.type == 'حاسوب محمول' %}
-                                        <i class="fas fa-laptop text-primary me-1"></i>
-                                    {% elif record.device.type == 'طابعة' %}
-                                        <i class="fas fa-print text-primary me-1"></i>
-                                    {% else %}
-                                        <i class="fas fa-hdd text-primary me-1"></i>
-                                    {% endif %}
-                                    <a href="{{ url_for('device_details', device_id=record.device_id) }}" class="text-decoration-none small">
-                                        {{ record.device.name }}
-                                    </a>
-                                </div>
-                            </td>
-                            <td class="small">{{ record.maintenance_date.strftime('%Y-%m-%d') }}</td>
-                            <td>
-                                <span class="d-inline-block text-truncate small" style="max-width: 200px;" data-bs-toggle="tooltip" title="{{ record.issue_description }}">
-                                    {{ record.issue_description }}
+                                <span class="badge bg-primary text-white">
+                                    <i class="fas fa-hashtag me-1"></i>
+                                    {{ record.reference or 'MAINT-' + record.id|string }}
                                 </span>
                             </td>
                             <td>
-                                {% if record.status == 'مكتمل' %}
-                                    <span class="badge bg-success">{{ record.status }}</span>
-                                {% elif record.status == 'قيد التنفيذ' %}
-                                    <span class="badge bg-warning text-dark">{{ record.status }}</span>
-                                {% else %}
-                                    <span class="badge bg-danger">{{ record.status }}</span>
-                                {% endif %}
-                            </td>
-                            <td class="small">
-                                <i class="fas fa-user-cog me-1 text-muted"></i>
-                                {{ record.technician }}
-                            </td>
-                            <td class="small">
-                                {% if record.completion_date %}
-                                    <i class="fas fa-calendar-check me-1 text-success"></i>
-                                    {{ record.completion_date.strftime('%Y-%m-%d') }}
-                                {% else %}
-                                    <i class="fas fa-hourglass-half me-1 text-warning"></i>
-                                    غير مكتمل
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="d-flex justify-content-center">
-                                    <a href="{{ url_for('edit_maintenance', record_id=record.id) }}" class="btn btn-sm btn-outline-warning me-1 py-0 px-1" data-bs-toggle="tooltip" title="تعديل">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{{ url_for('print_maintenance', record_id=record.id) }}" class="btn btn-sm btn-outline-info py-0 px-1" target="_blank" data-bs-toggle="tooltip" title="طباعة">
-                                        <i class="fas fa-print"></i>
-                                    </a>
-                                    <!-- PDF export button removed -->
+                                <div class="d-flex align-items-center">
+                                    {% if record.device.type == 'ordinateur de bureau' %}
+                                        <i class="fas fa-desktop text-primary me-1"></i>
+                                    {% elif record.device.type == 'ordinateur portable' %}
+                                        <i class="fas fa-laptop text-primary me-1"></i>
+                                    {% else %}
+                                        <i class="fas fa-hdd text-primary me-1"></i>
+                                    {% endif %}
+                                    {{ record.device.name }}
                                 </div>
+                            </td>
+                            <td>{{ record.maintenance_date.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ record.issue_description }}</td>
+                            <td>
+                                <span class="badge rounded-pill bg-{{ 'success' if record.status == 'terminé' else 'warning' if record.status == 'en cours' else 'info' }}">
+                                    {{ record.status }}
+                                </span>
+                            </td>
+                            <td>{{ record.technician or '-' }}</td>
+                            <td>{{ record.completion_date.strftime('%d/%m/%Y') if record.completion_date else '-' }}</td>
+                            <td class="text-center">
+                                <a href="{{ url_for('edit_maintenance', record_id=record.id) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ url_for('print_maintenance', record_id=record.id) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Imprimer" target="_blank">
+                                    <i class="fas fa-print"></i>
+                                </a>
+                                <a href="{{ url_for('delete_maintenance', record_id=record.id) }}" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Supprimer" onclick="return confirmDelete(event, 'Êtes-vous sûr de vouloir supprimer ce registre de maintenance?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -219,20 +204,171 @@
             
             <!-- Empty State -->
             <div id="empty-state" class="text-center py-4 d-none">
-                <img src="https://cdn-icons-png.flaticon.com/512/5058/5058432.png" alt="No maintenance records" style="width: 100px; opacity: 0.5;" class="mb-2">
-                <h6 class="text-muted">لا توجد سجلات صيانة مطابقة للبحث</h6>
-                <p class="text-muted small">حاول تغيير معايير البحث أو <button id="clear-filters" class="btn btn-link p-0 small">إعادة تعيين الفلاتر</button></p>
+                <img src="https://cdn-icons-png.flaticon.com/512/5058/5058432.png" alt="Aucun registre" style="width: 100px; opacity: 0.5;" class="mb-2">
+                <h6 class="text-muted">Aucun registre de maintenance ne correspond à votre recherche</h6>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/table-filters.js') }}"></script>
 <script>
+    // Table Filter Class
+    class TableFilter {
+        constructor(options) {
+            this.tableId = options.tableId;
+            this.emptyStateId = options.emptyStateId;
+            this.filterSelectors = options.filterSelectors;
+            this.searchSelector = options.searchSelector;
+            this.resetSelector = options.resetSelector;
+            this.dataAttributes = options.dataAttributes;
+            this.statsCounters = options.statsCounters;
+            
+            this.table = document.getElementById(this.tableId);
+            this.emptyState = document.getElementById(this.emptyStateId);
+            this.rows = this.table.querySelectorAll('tbody tr');
+            
+            this.initCounters();
+            this.initEventListeners();
+        }
+        
+        initCounters() {
+            // Count records by status
+            let pendingCount = 0;
+            let inProgressCount = 0;
+            let completedCount = 0;
+            
+            this.rows.forEach(row => {
+                const status = row.getAttribute('data-status');
+                if (status === 'en attente') pendingCount++;
+                else if (status === 'en cours') inProgressCount++;
+                else if (status === 'terminé') completedCount++;
+            });
+            
+            // Update counters
+            if (this.statsCounters.pending) {
+                document.getElementById(this.statsCounters.pending).textContent = pendingCount;
+            }
+            if (this.statsCounters.inProgress) {
+                document.getElementById(this.statsCounters.inProgress).textContent = inProgressCount;
+            }
+            if (this.statsCounters.completed) {
+                document.getElementById(this.statsCounters.completed).textContent = completedCount;
+            }
+        }
+        
+        initEventListeners() {
+            // Add event listeners for filters
+            for (const [key, selector] of Object.entries(this.filterSelectors)) {
+                const element = document.querySelector(selector);
+                if (element) {
+                    element.addEventListener('change', () => this.filterTable());
+                }
+            }
+            
+            // Add event listener for search
+            const searchInput = document.querySelector(this.searchSelector);
+            if (searchInput) {
+                searchInput.addEventListener('input', () => this.filterTable());
+            }
+            
+            // Add event listener for reset button
+            const resetButton = document.querySelector(this.resetSelector);
+            if (resetButton) {
+                resetButton.addEventListener('click', () => this.resetFilters());
+            }
+        }
+        
+        filterTable() {
+            let visibleCount = 0;
+            
+            // Get filter values
+            const filters = {};
+            for (const [key, selector] of Object.entries(this.filterSelectors)) {
+                const element = document.querySelector(selector);
+                if (element) {
+                    filters[key] = element.value.toLowerCase();
+                }
+            }
+            
+            // Get search value
+            const searchValue = document.querySelector(this.searchSelector)?.value.toLowerCase() || '';
+            
+            // Filter rows
+            this.rows.forEach(row => {
+                let visible = true;
+                
+                // Check filters
+                for (const [key, value] of Object.entries(filters)) {
+                    if (value) {
+                        const dataValue = row.getAttribute(`data-${key}`)?.toLowerCase() || '';
+                        if (key === 'date') {
+                            // For date filter, check if the date matches exactly
+                            if (dataValue !== value) {
+                                visible = false;
+                                break;
+                            }
+                        } else {
+                            // For other filters, check if the value is contained
+                            if (!dataValue.includes(value)) {
+                                visible = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Check search
+                if (visible && searchValue) {
+                    visible = false;
+                    const textContent = row.textContent.toLowerCase();
+                    if (textContent.includes(searchValue)) {
+                        visible = true;
+                    }
+                }
+                
+                // Show/hide row
+                row.style.display = visible ? '' : 'none';
+                if (visible) visibleCount++;
+            });
+            
+            // Show/hide empty state
+            if (this.emptyState) {
+                this.emptyState.classList.toggle('d-none', visibleCount > 0);
+            }
+        }
+        
+        resetFilters() {
+            // Reset filter inputs
+            for (const selector of Object.values(this.filterSelectors)) {
+                const element = document.querySelector(selector);
+                if (element) {
+                    element.value = '';
+                }
+            }
+            
+            // Reset search input
+            const searchInput = document.querySelector(this.searchSelector);
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            
+            // Show all rows
+            this.rows.forEach(row => {
+                row.style.display = '';
+            });
+            
+            // Hide empty state
+            if (this.emptyState) {
+                this.emptyState.classList.add('d-none');
+            }
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize table filter
-        const maintenanceFilter = new TableFilter({
+        // Initialize table filters
+        const tableFilter = new TableFilter({
             tableId: 'maintenance-table',
             emptyStateId: 'empty-state',
             filterSelectors: {
@@ -240,26 +376,66 @@
                 technician: '#technician-filter',
                 date: '#date-filter'
             },
+            searchSelector: '#search-input',
+            resetSelector: '#reset-filters',
             dataAttributes: ['status', 'technician', 'date'],
             statsCounters: {
-                completed: {
-                    elementId: 'completed-records',
-                    dataAttr: 'status',
-                    value: 'مكتمل'
-                },
-                inProgress: {
-                    elementId: 'in-progress-records',
-                    dataAttr: 'status',
-                    value: 'قيد التنفيذ'
-                },
-                pending: {
-                    elementId: 'pending-records',
-                    dataAttr: 'status',
-                    value: 'قيد الانتظار'
-                }
+                total: 'total-records',
+                pending: 'pending-records',
+                inProgress: 'in-progress-records',
+                completed: 'completed-records'
             }
         });
+        
+        // Add event listener for date filter
+        const dateFilter = document.querySelector('#date-filter');
+        if (dateFilter) {
+            dateFilter.addEventListener('change', function() {
+                tableFilter.filterTable();
+            });
+        }
+        
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+        
+        // Confirm delete function
+        window.confirmDelete = function(event, message) {
+            if (!confirm(message)) {
+                event.preventDefault();
+                return false;
+            }
+            return true;
+        };
+        
+        // Add custom styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .icon-circle {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .stats-card:hover {
+                transform: translateY(-5px);
+                transition: transform 0.3s ease;
+            }
+            
+            .bg-gradient-warning {
+                background: linear-gradient(135deg, #ff9a00, #ff6a00);
+            }
+            
+            .table-hover tbody tr:hover {
+                background-color: rgba(0, 123, 255, 0.05);
+            }
+        `;
+        document.head.appendChild(style);
     });
 </script>
-{% endblock %}
 {% endblock %}

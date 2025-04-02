@@ -1,15 +1,16 @@
 /* Custom CSS for Device Management System */
 
 /* Import Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
 /* General Styles */
 body {
-    font-family: 'Tajawal', sans-serif;
+    font-family: 'Roboto', sans-serif;
     background-color: #f8f9fa;
     color: #495057;
     line-height: 1.6;
     transition: background-color 0.3s ease;
+    direction: ltr; /* Changed from RTL to LTR */
 }
 
 /* Navbar Styles */
@@ -67,6 +68,47 @@ body {
 
 .card-body {
     padding: 1.5rem;
+}
+
+/* Adjust icon positioning for LTR */
+.me-1 {
+    margin-right: 0.25rem !important;
+    margin-left: 0 !important;
+}
+
+.me-2 {
+    margin-right: 0.5rem !important;
+    margin-left: 0 !important;
+}
+
+.ms-1 {
+    margin-left: 0.25rem !important;
+    margin-right: 0 !important;
+}
+
+.ms-2 {
+    margin-left: 0.5rem !important;
+    margin-right: 0 !important;
+}
+
+/* Adjust border positioning for LTR */
+.border-start {
+    border-left: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+    border-right: 0 !important;
+}
+
+.border-end {
+    border-right: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+    border-left: 0 !important;
+}
+
+/* Text alignment adjustments */
+.text-start {
+    text-align: left !important;
+}
+
+.text-end {
+    text-align: right !important;
 }
 
 /* Table Styles */
@@ -409,5 +451,109 @@ body {
     .timeline-icon {
         width: 35px;
         height: 35px;
+    }
+}
+
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* Card Styles */
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hover-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.interactive-card {
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.interactive-card:hover {
+    transform: translateY(-3px);
+}
+
+.stats-card {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: none;
+}
+
+.stats-card .card-footer {
+    background-color: rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+}
+
+.stats-icon {
+    opacity: 0.8;
+}
+
+/* Device Details Styles */
+.device-details {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+}
+
+.detail-item {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    padding: 0.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.device-icon-large {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dashboard Styles */
+.dashboard-header {
+    margin-bottom: 1.5rem;
+}
+
+.counter {
+    font-weight: 600;
+}
+
+/* Animations */
+.animate__animated.animate__fadeIn {
+    --animate-duration: 0.5s;
+}
+
+.animate__animated.animate__fadeInUp {
+    --animate-duration: 0.5s;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .detail-item {
+        grid-template-columns: 1fr;
+    }
+    
+    .detail-label {
+        margin-bottom: 0.25rem;
     }
 }

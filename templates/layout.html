@@ -1,155 +1,338 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الأجهزة</title>
-    <!-- Bootstrap RTL CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <title>Informatique Parc</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common-components.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+    <style>
+        :root {
+            --primary-color: #3a0ca3;
+            --secondary-color: #4361ee;
+            --accent-color: #4895ef;
+            --success-color: #2ec4b6;
+            --warning-color: #ff9f1c;
+            --danger-color: #e71d36;
+            --info-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --body-bg: #f5f7fa;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--body-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .navbar {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 0.8rem 1rem;
+        }
+        
+        .navbar-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            font-size: 1.4rem;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            margin: 0 0.3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+        
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.25);
+            font-weight: 600;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background-color: #fff;
+            border-radius: 3px;
+        }
+        
+        .btn-light {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        
+        .btn-light:hover {
+            background-color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .container-fluid {
+            max-width: 1400px;
+            padding: 0 1.5rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+        
+        .footer {
+            background-color: #fff;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            margin-top: auto;
+            padding: 1.2rem 0;
+        }
+        
+        .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px) translateX(5px);
+        }
+        
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #2ec4b6, #57cc99);
+        }
+        
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, #ff9f1c, #f48c06);
+        }
+        
+        .bg-gradient-danger {
+            background: linear-gradient(135deg, #e71d36, #ff5e5b);
+        }
+        
+        .bg-gradient-info {
+            background: linear-gradient(135deg, #4cc9f0, #4895ef);
+        }
+        
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .table th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .btn {
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .badge {
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+        }
+        
+        .rounded-pill {
+            border-radius: 50rem !important;
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
-        <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4 animate__animated animate__fadeInDown">
+        <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-                <i class="fas fa-laptop-medical me-2"></i>
-                <span>نظام إدارة الأجهزة</span>
+                <div class="brand-icon me-2 bg-white text-primary p-2 rounded-circle">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                INFORMATIQUE PARC
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.path == url_for('index') }}" href="{{ url_for('index') }}">
-                            <i class="fas fa-home me-1"></i> الرئيسية
+                        <a class="nav-link {{ 'active' if request.endpoint == 'index' }}" href="{{ url_for('index') }}">
+                            <i class="fas fa-tachometer-alt me-1"></i> Tableau de Bord
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.path.startswith('/devices') }}" href="{{ url_for('devices') }}">
-                            <i class="fas fa-laptop me-1"></i> الأجهزة
+                        <a class="nav-link {{ 'active' if request.endpoint == 'devices' or request.endpoint == 'device_details' or request.endpoint == 'add_device' or request.endpoint == 'edit_device' }}" href="{{ url_for('devices') }}">
+                            <i class="fas fa-laptop me-1"></i> Appareils
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.path.startswith('/maintenance') }}" href="{{ url_for('maintenance') }}">
-                            <i class="fas fa-tools me-1"></i> الصيانة
+                        <a class="nav-link {{ 'active' if request.endpoint == 'maintenance' or request.endpoint == 'add_maintenance' or request.endpoint == 'edit_maintenance' }}" href="{{ url_for('maintenance') }}">
+                            <i class="fas fa-tools me-1"></i> Maintenance
                         </a>
                     </li>
                 </ul>
+                <div class="d-flex">
+                    <a href="{{ url_for('add_device') }}" class="btn btn-light btn-sm me-2 d-flex align-items-center">
+                        <i class="fas fa-plus-circle me-1"></i> Ajouter un Appareil
+                    </a>
+                    <a href="{{ url_for('add_maintenance') }}" class="btn btn-warning btn-sm text-white d-flex align-items-center">
+                        <i class="fas fa-tools me-1"></i> Nouvelle Maintenance
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <div class="container py-4">
+    <div class="container-fluid mb-4">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show animate__animated animate__fadeIn">
-                        <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <div class="alert alert-{{ category }} alert-dismissible fade show mb-3 animate__animated animate__fadeIn" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' if category == 'warning' else 'info-circle' if category == 'info' else 'times-circle' }} me-2 fa-lg"></i>
+                            <div>{{ message }}</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <!-- Breadcrumb -->
-        {% if request.path != url_for('index') %}
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb bg-white p-3 rounded shadow-sm">
-                <li class="breadcrumb-item"><a href="{{ url_for('index') }}"><i class="fas fa-home"></i></a></li>
-                {% if request.path.startswith('/devices') %}
-                    <li class="breadcrumb-item {% if request.path == url_for('devices') %}active{% endif %}">
-                        {% if request.path != url_for('devices') %}<a href="{{ url_for('devices') }}">{% endif %}
-                        الأجهزة
-                        {% if request.path != url_for('devices') %}</a>{% endif %}
-                    </li>
-                    {% if '/add' in request.path %}
-                        <li class="breadcrumb-item active">إضافة جهاز</li>
-                    {% elif '/edit' in request.path %}
-                        <li class="breadcrumb-item active">تعديل جهاز</li>
-                    {% elif request.path != url_for('devices') %}
-                        <li class="breadcrumb-item active">تفاصيل الجهاز</li>
-                    {% endif %}
-                {% elif request.path.startswith('/maintenance') %}
-                    <li class="breadcrumb-item {% if request.path == url_for('maintenance') %}active{% endif %}">
-                        {% if request.path != url_for('maintenance') %}<a href="{{ url_for('maintenance') }}">{% endif %}
-                        الصيانة
-                        {% if request.path != url_for('maintenance') %}</a>{% endif %}
-                    </li>
-                    {% if '/add' in request.path %}
-                        <li class="breadcrumb-item active">إضافة سجل صيانة</li>
-                    {% elif '/edit' in request.path %}
-                        <li class="breadcrumb-item active">تعديل سجل صيانة</li>
-                    {% endif %}
-                {% endif %}
-            </ol>
-        </nav>
-        {% endif %}
-
-        <!-- Page Content -->
+        <!-- Content Block -->
         {% block content %}{% endblock %}
     </div>
 
     <!-- Footer -->
-    <footer class="bg-white text-center text-muted py-3 mt-4 border-top">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 text-md-start">
-                    <p class="mb-0">نظام إدارة الأجهزة &copy; {{ now.year }}</p>
+    <footer class="footer py-3 mt-auto">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="brand-icon me-2 bg-primary text-white p-1 rounded-circle">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <span class="fw-bold text-primary">INFORMATIQUE PARC</span>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="mb-0">
-                        <span id="current-time">الوقت الحالي: {{ now.strftime('%Y-%m-%d %H:%M') }}</span>
-                    </p>
-                </div>
+                <span class="text-muted">EPTRC © 2025 </span>
+                <span class="badge bg-primary">Version 2.0.1</span>
             </div>
         </div>
     </footer>
 
-    <!-- Bootstrap JS Bundle -->
+    <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     
     <script>
-        // إخفاء رسائل التنبيه تلقائيًا بعد 5 ثوانٍ
-        window.setTimeout(function() {
-            $(".alert").fadeTo(500, 0).slideUp(500, function(){
-                $(this).remove(); 
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
             });
-        }, 5000);
-        
-        // تحديث الوقت الحالي كل دقيقة
-        function updateCurrentTime() {
-            const now = new Date();
-            const options = { 
-                year: 'numeric', 
-                month: '2-digit', 
-                day: '2-digit',
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false
-            };
-            document.getElementById('current-time').textContent = 'الوقت الحالي: ' + now.toLocaleString('ar-SA', options);
-        }
-        
-        setInterval(updateCurrentTime, 60000);
-        updateCurrentTime();
+            
+            // Add animation to cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.classList.add('shadow');
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.classList.remove('shadow');
+                });
+            });
+        });
     </script>
     
+    <!-- Additional Scripts Block -->
     {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,225 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('maintenance') }}">Maintenance</a></li>
+            <li class="breadcrumb-item active">{{ 'Modifier' if record.id else 'Ajouter' }} un Registre</li>
+        </ol>
+    </nav>
+
+    <!-- Form Card -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-gradient-warning text-white py-3">
+            <h4 class="mb-0 d-flex align-items-center">
+                <span class="icon-circle bg-white text-warning me-3">
+                    <i class="fas fa-{{ 'edit' if record.id else 'plus-circle' }}"></i>
+                </span>
+                {{ 'Modifier' if record.id else 'Ajouter' }} un Registre de Maintenance
+            </h4>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST" action="{{ url_for('edit_maintenance', record_id=record.id) if record.id else url_for('add_maintenance') }}">
+                <div class="row g-4">
+                    <!-- Basic Information -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4 pb-2 border-bottom">
+                                    <i class="fas fa-clipboard-list me-2 text-warning"></i>Informations de Base
+                                </h5>
+                                
+                                <div class="mb-4">
+                                    <label for="device_id" class="form-label fw-bold">Appareil <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-laptop text-warning"></i></span>
+                                        <select class="form-select" id="device_id" name="device_id" required {{ 'disabled' if device_id }}>
+                                            <option value="">Sélectionner un appareil</option>
+                                            {% for device in devices %}
+                                                <option value="{{ device.id }}" {{ 'selected' if (record.device_id == device.id) or (device_id and device_id == device.id) }}>
+                                                    {{ device.name }} ({{ device.type }}) - {{ device.serial_number }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    {% if device_id %}
+                                        <input type="hidden" name="device_id" value="{{ device_id }}">
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="maintenance_date" class="form-label fw-bold">Date de Maintenance <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-calendar-alt text-warning"></i></span>
+                                        <input type="date" class="form-control" id="maintenance_date" name="maintenance_date" value="{{ record.maintenance_date.strftime('%Y-%m-%d') if record.maintenance_date else today }}" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="issue_description" class="form-label fw-bold">Description du Problème <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-exclamation-circle text-warning"></i></span>
+                                        <textarea class="form-control" id="issue_description" name="issue_description" rows="3" required>{{ record.issue_description }}</textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="status" class="form-label fw-bold">Statut <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-tasks text-warning"></i></span>
+                                        <select class="form-select" id="status" name="status" required>
+                                            <option value="en attente" {{ 'selected' if record.status == 'en attente' }}>En Attente</option>
+                                            <option value="en cours" {{ 'selected' if record.status == 'en cours' }}>En Cours</option>
+                                            <option value="terminé" {{ 'selected' if record.status == 'terminé' }}>Terminé</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Information -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4 pb-2 border-bottom">
+                                    <i class="fas fa-info-circle me-2 text-warning"></i>Informations Supplémentaires
+                                </h5>
+                                
+                                <div class="mb-4">
+                                    <label for="technician" class="form-label fw-bold">Technicien <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-user-cog text-warning"></i></span>
+                                        <input type="text" class="form-control" id="technician" name="technician" value="{{ record.technician }}" required list="technicians">
+                                        <datalist id="technicians">
+                                            {% for technician in technicians %}
+                                                <option value="{{ technician }}">
+                                            {% endfor %}
+                                        </datalist>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="actions_taken" class="form-label fw-bold">Actions Effectuées</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-tools text-warning"></i></span>
+                                        <textarea class="form-control" id="actions_taken" name="actions_taken" rows="3">{{ record.actions_taken }}</textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="completion_date" class="form-label fw-bold">Date d'Achèvement</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-flag-checkered text-warning"></i></span>
+                                        <input type="date" class="form-control" id="completion_date" name="completion_date" value="{{ record.completion_date.strftime('%Y-%m-%d') if record.completion_date }}">
+                                    </div>
+                                    <div class="form-text ms-4">Remplir uniquement si le statut est "Terminé"</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="notes" class="form-label fw-bold">Notes</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-sticky-note text-warning"></i></span>
+                                        <textarea class="form-control" id="notes" name="notes" rows="3">{{ record.notes }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end mt-4">
+                    <a href="{{ url_for('maintenance') }}" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-times me-1"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-warning px-4">
+                        <i class="fas fa-{{ 'save' if record.id else 'plus' }} me-1"></i>
+                        {{ 'Enregistrer les Modifications' if record.id else 'Ajouter le Registre' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #ff9a00, #ff6a00);
+    }
+    
+    .card {
+        transition: transform 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .required-field label::after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #ff9a00;
+        box-shadow: 0 0 0 0.25rem rgba(255, 154, 0, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Status change handler
+        const statusSelect = document.getElementById('status');
+        const completionDateInput = document.getElementById('completion_date');
+        const completionDateContainer = completionDateInput.closest('.mb-4');
+        
+        function updateCompletionDateVisibility() {
+            if (statusSelect.value === 'terminé') {
+                completionDateInput.setAttribute('required', 'required');
+                completionDateContainer.classList.add('required-field');
+                completionDateContainer.querySelector('.form-text').innerHTML = '<span class="text-danger">Obligatoire pour le statut "Terminé"</span>';
+            } else {
+                completionDateInput.removeAttribute('required');
+                completionDateContainer.classList.remove('required-field');
+                completionDateContainer.querySelector('.form-text').textContent = 'Remplir uniquement si le statut est "Terminé"';
+            }
+        }
+        
+        statusSelect.addEventListener('change', updateCompletionDateVisibility);
+        updateCompletionDateVisibility();
+        
+        // Add animation effects
+        const formInputs = document.querySelectorAll('.form-control, .form-select');
+        formInputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.closest('.mb-4').style.transform = 'translateX(5px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.closest('.mb-4').style.transform = 'translateX(0)';
+            });
+        });
+        
+        // Set today's date as default for maintenance date if empty
+        const maintenanceDateInput = document.getElementById('maintenance_date');
+        if (!maintenanceDateInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            maintenanceDateInput.value = today;
+        }
+    });
+</script>
+{% endblock %}

@@ -1,22 +1,60 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="container-fluid px-0">
-    <!-- Header Section -->
-    <div class="row mb-3">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('devices') }}">Appareils</a></li>
+            <li class="breadcrumb-item active">{{ device.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Device Header -->
+    <div class="row mb-4">
         <div class="col-md-12">
-            <div class="card shadow-sm border-0 bg-light">
-                <div class="card-body py-3">
+            <div class="card shadow-sm border-0 bg-gradient-primary text-white">
+                <div class="card-body py-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h2 class="mb-0"><i class="fas fa-laptop me-2 text-primary"></i>{{ device.name }}</h2>
-                            <p class="text-muted mb-0">{{ device.type }} - {{ device.serial_number }}</p>
+                        <div class="d-flex align-items-center">
+                            <div class="device-icon-large me-4 rounded-circle bg-white p-3">
+                                {% if device.type == 'ordinateur de bureau' %}
+                                    <i class="fas fa-desktop fa-2x text-primary"></i>
+                                {% elif device.type == 'ordinateur portable' %}
+                                    <i class="fas fa-laptop fa-2x text-primary"></i>
+                                {% elif device.type == 'imprimante' %}
+                                    <i class="fas fa-print fa-2x text-primary"></i>
+                                {% elif device.type == 'scanner' %}
+                                    <i class="fas fa-scanner fa-2x text-primary"></i>
+                                {% elif device.type == 'routeur' %}
+                                    <i class="fas fa-network-wired fa-2x text-primary"></i>
+                                {% elif device.type == 'switch' %}
+                                    <i class="fas fa-ethernet fa-2x text-primary"></i>
+                                {% elif device.type == 'serveur' %}
+                                    <i class="fas fa-server fa-2x text-primary"></i>
+                                {% else %}
+                                    <i class="fas fa-hdd fa-2x text-primary"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h2 class="mb-0 fw-bold">{{ device.name }}</h2>
+                                <p class="text-white-50 mb-0 fs-5">
+                                    {{ device.type|capitalize }} | 
+                                    <span class="badge bg-{{ 'success' if device.status == 'actif' else 'warning' if device.status == 'en maintenance' else 'danger' }} fs-6">
+                                        {{ device.status|upper }}
+                                    </span>
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <a href="{{ url_for('edit_device', device_id=device.id) }}" class="btn btn-warning me-2">
-                                <i class="fas fa-edit me-1"></i> تعديل الجهاز
+                        <div class="action-buttons">
+                            <a href="{{ url_for('edit_device', device_id=device.id) }}" class="btn btn-light me-2">
+                                <i class="fas fa-edit me-1"></i> Modifier
                             </a>
-                            <a href="{{ url_for('add_maintenance', device_id=device.id) }}" class="btn btn-primary">
-                                <i class="fas fa-tools me-1"></i> إضافة صيانة
+                            <a href="{{ url_for('add_maintenance', device_id=device.id) }}" class="btn btn-warning me-2">
+                                <i class="fas fa-tools me-1"></i> Ajouter Maintenance
+                            </a>
+                            <a href="{{ url_for('delete_device', device_id=device.id) }}" class="btn btn-danger" onclick="return confirmDelete(event, 'Êtes-vous sûr de vouloir supprimer cet appareil?')">
+                                <i class="fas fa-trash-alt me-1"></i> Supprimer
                             </a>
                         </div>
                     </div>
@@ -25,230 +63,251 @@
         </div>
     </div>
 
-    <!-- Device Information Section -->
-    <div class="row mb-3">
-        <div class="col-md-8">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white py-2">
-                    <h5 class="mb-0"><i class="fas fa-info-circle me-2 text-primary"></i>معلومات الجهاز</h5>
+    <!-- Device Details and Maintenance History -->
+    <div class="row">
+        <!-- Device Details -->
+        <div class="col-md-5 mb-4">
+            <!-- Device Information Card -->
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary text-white me-2">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                        Informations de l'Appareil
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <table class="table table-bordered table-sm mb-0">
-                                <tr>
-                                    <th class="bg-light" style="width: 40%">الاسم</th>
-                                    <td>{{ device.name }}</td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light">النوع</th>
-                                    <td>
-                                        {% if device.type == 'حاسوب مكتبي' %}
-                                            <i class="fas fa-desktop text-primary me-1"></i>
-                                        {% elif device.type == 'حاسوب محمول' %}
-                                            <i class="fas fa-laptop text-primary me-1"></i>
-                                        {% elif device.type == 'طابعة' %}
-                                            <i class="fas fa-print text-primary me-1"></i>
-                                        {% elif device.type == 'ماسح ضوئي' %}
-                                            <i class="fas fa-scanner text-primary me-1"></i>
-                                        {% elif device.type == 'راوتر' %}
-                                            <i class="fas fa-wifi text-primary me-1"></i>
-                                        {% elif device.type == 'سويتش' %}
-                                            <i class="fas fa-network-wired text-primary me-1"></i>
-                                        {% elif device.type == 'خادم' %}
-                                            <i class="fas fa-server text-primary me-1"></i>
-                                        {% else %}
-                                            <i class="fas fa-hdd text-primary me-1"></i>
-                                        {% endif %}
-                                        {{ device.type }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light">الرقم التسلسلي</th>
-                                    <td>{{ device.serial_number }}</td>
-                                </tr>
-                                <!-- Purchase date row removed -->
-                            </table>
+                            <div class="info-group mb-3 p-2 border-start border-primary border-3 bg-light">
+                                <div class="text-muted small">Nom</div>
+                                <div class="fw-bold">{{ device.name }}</div>
+                            </div>
+                            
+                            <div class="info-group mb-3 p-2 border-start border-primary border-3 bg-light">
+                                <div class="text-muted small">Type</div>
+                                <div class="fw-bold">{{ device.type|capitalize }}</div>
+                            </div>
+                            
+                            <div class="info-group mb-3 p-2 border-start border-primary border-3 bg-light">
+                                <div class="text-muted small">Numéro de Série</div>
+                                <div class="fw-bold">{{ device.serial_number }}</div>
+                            </div>
+                            
+                            <div class="info-group mb-3 p-2 border-start border-primary border-3 bg-light">
+                                <div class="text-muted small">Statut</div>
+                                <div>
+                                    <span class="badge bg-{{ 'success' if device.status == 'actif' else 'warning' if device.status == 'en maintenance' else 'secondary' }}">
+                                        {{ device.status }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="info-group mb-3 p-2 border-start border-primary border-3 bg-light">
+                                <div class="text-muted small">Service</div>
+                                <div class="fw-bold">{{ device.service or '-' }}</div>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <table class="table table-bordered table-sm mb-0">
-                                <tr>
-                                    <th class="bg-light" style="width: 40%">الحالة</th>
-                                    <td>
-                                        {% if device.status == 'فعال' %}
-                                            <span class="badge bg-success">
-                                                <i class="fas fa-check-circle me-1"></i>{{ device.status }}
-                                            </span>
-                                        {% elif device.status == 'قيد الصيانة' %}
-                                            <span class="badge bg-warning text-dark">
-                                                <i class="fas fa-tools me-1"></i>{{ device.status }}
-                                            </span>
-                                        {% else %}
-                                            <span class="badge bg-danger">
-                                                <i class="fas fa-times-circle me-1"></i>{{ device.status }}
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light">الموقع</th>
-                                    <td>
-                                        <i class="fas fa-map-marker-alt text-danger me-1"></i>
-                                        {{ device.location or 'غير محدد' }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light">المسؤول</th>
-                                    <td>
-                                        <i class="fas fa-user text-primary me-1"></i>
-                                        {{ device.owner or 'غير محدد' }}
-                                    </td>
-                                </tr>
-                                <!-- Device age row removed -->
-                            </table>
+                            <div class="info-group mb-3 p-2 border-start border-primary border-3 bg-light">
+                                <div class="text-muted small">Département</div>
+                                <div class="fw-bold">{{ device.department or '-' }}</div>
+                            </div>
+                            
+                            <div class="info-group mb-3 p-2 border-start border-primary border-3 bg-light">
+                                <div class="text-muted small">Responsable</div>
+                                <div class="fw-bold d-flex align-items-center">
+                                    {% if device.owner %}
+                                        {{ device.owner }}
+                                        <a href="{{ url_for('devices_by_owner', owner=device.owner) }}" class="ms-2 text-primary" data-bs-toggle="tooltip" title="Voir tous les appareils de ce responsable">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="info-group mb-3 p-2 border-start border-primary border-3 bg-light">
+                                <div class="text-muted small">Assigné à</div>
+                                <div class="fw-bold d-flex align-items-center">
+                                    {% if device.assigned_to %}
+                                        {{ device.assigned_to }}
+                                        <a href="{{ url_for('devices_by_assigned', assigned_to=device.assigned_to) }}" class="ms-2 text-primary" data-bs-toggle="tooltip" title="Voir tous les appareils assignés à cette personne">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="info-group mb-3 p-2 border-start border-primary border-3 bg-light">
+                                <div class="text-muted small">Adresse MAC</div>
+                                <div class="fw-bold">{{ device.mac_address or '-' }}</div>
+                            </div>
+                            
+                            <div class="info-group mb-3 p-2 border-start border-primary border-3 bg-light">
+                                <div class="text-muted small">Notes</div>
+                                <div class="fw-bold">{{ device.notes or '-' }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white py-2">
-                    <h5 class="mb-0"><i class="fas fa-sticky-note me-2 text-primary"></i>ملاحظات</h5>
+        
+        <!-- Maintenance History -->
+        <div class="col-md-7 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-warning text-white me-2">
+                                <i class="fas fa-history"></i>
+                            </span>
+                            Historique de Maintenance
+                        </h5>
+                        <a href="{{ url_for('add_maintenance', device_id=device.id) }}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-1"></i> Ajouter
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body">
-                    {% if device.notes %}
-                        <p class="mb-0">{{ device.notes }}</p>
+                <div class="card-body p-0">
+                    {% if maintenance_records %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0">Date</th>
+                                    <th class="border-0">Problème</th>
+                                    <th class="border-0">Statut</th>
+                                    <th class="border-0">Technicien</th>
+                                    <th class="border-0 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in maintenance_records %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-light text-dark p-2">
+                                            <i class="far fa-calendar-alt me-1 text-primary"></i>
+                                            {{ record.maintenance_date.strftime('%d/%m/%Y') }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip" title="{{ record.issue_description }}">
+                                            {{ record.issue_description }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if record.status == 'terminé' else 'warning' if record.status == 'en cours' else 'info' }} p-2">
+                                            <i class="fas fa-{{ 'check' if record.status == 'terminé' else 'cog fa-spin' if record.status == 'en cours' else 'clock' }} me-1"></i>
+                                            {{ record.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-primary text-white me-2">
+                                                {{ record.technician[:1].upper() }}
+                                            </div>
+                                            {{ record.technician }}
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ url_for('edit_maintenance', record_id=record.id) }}" class="btn btn-sm btn-warning me-1" data-bs-toggle="tooltip" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url_for('delete_maintenance', record_id=record.id) }}" class="btn btn-sm btn-danger" onclick="return confirmDelete(event, 'Êtes-vous sûr de vouloir supprimer ce registre de maintenance?')" data-bs-toggle="tooltip" title="Supprimer">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                     {% else %}
-                        <div class="text-center text-muted py-4">
-                            <i class="fas fa-sticky-note fa-3x mb-2 opacity-25"></i>
-                            <p>لا توجد ملاحظات مسجلة لهذا الجهاز</p>
+                    <div class="text-center py-5">
+                        <div class="empty-state-icon mb-3">
+                            <i class="fas fa-tools fa-4x text-muted"></i>
                         </div>
+                        <h5 class="text-muted">Aucun historique de maintenance pour cet appareil</h5>
+                        <p class="text-muted">Ajoutez un nouveau registre de maintenance pour commencer</p>
+                        <a href="{{ url_for('add_maintenance', device_id=device.id) }}" class="btn btn-primary mt-2">
+                            <i class="fas fa-plus-circle me-1"></i> Ajouter une Maintenance
+                        </a>
+                    </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Maintenance Records Section -->
-    <div class="card shadow-sm mb-3">
-        <div class="card-header bg-white py-2">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-history me-2 text-primary"></i>سجلات الصيانة</h5>
-                <a href="{{ url_for('add_maintenance', device_id=device.id) }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-plus-circle me-1"></i> إضافة سجل صيانة
-                </a>
-            </div>
-        </div>
-        <div class="card-body p-0">
-            {% if maintenance_records %}
-            <div class="table-responsive">
-                <table class="table table-hover table-sm mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="border-0">#</th>
-                            <th class="border-0">تاريخ الصيانة</th>
-                            <th class="border-0">وصف المشكلة</th>
-                            <th class="border-0">الإجراءات المتخذة</th>
-                            <th class="border-0">الحالة</th>
-                            <th class="border-0">الفني</th>
-                            <th class="border-0">تاريخ الإكمال</th>
-                            <th class="border-0 text-center">الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in maintenance_records %}
-                        <tr>
-                            <td>{{ record.id }}</td>
-                            <td class="small">
-                                <i class="fas fa-calendar-day text-primary me-1"></i>
-                                {{ record.maintenance_date.strftime('%Y-%m-%d') }}
-                            </td>
-                            <td>
-                                <span class="d-inline-block text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip" title="{{ record.issue_description }}">
-                                    {{ record.issue_description }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="d-inline-block text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip" title="{{ record.actions_taken or 'لا توجد إجراءات مسجلة' }}">
-                                    {{ record.actions_taken or 'لا توجد إجراءات مسجلة' }}
-                                </span>
-                            </td>
-                            <td>
-                                {% if record.status == 'مكتمل' %}
-                                    <span class="badge bg-success">
-                                        <i class="fas fa-check-circle me-1"></i>{{ record.status }}
-                                    </span>
-                                {% elif record.status == 'قيد التنفيذ' %}
-                                    <span class="badge bg-warning text-dark">
-                                        <i class="fas fa-cog fa-spin me-1"></i>{{ record.status }}
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-danger">
-                                        <i class="fas fa-clock me-1"></i>{{ record.status }}
-                                    </span>
-                                {% endif %}
-                            </td>
-                            <td class="small">
-                                <i class="fas fa-user-cog text-muted me-1"></i>
-                                {{ record.technician }}
-                            </td>
-                            <td class="small">
-                                {% if record.completion_date %}
-                                    <i class="fas fa-calendar-check text-success me-1"></i>
-                                    {{ record.completion_date.strftime('%Y-%m-%d') }}
-                                {% else %}
-                                    <i class="fas fa-hourglass-half text-warning me-1"></i>
-                                    غير مكتمل
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="d-flex justify-content-center">
-                                    <a href="{{ url_for('edit_maintenance', record_id=record.id) }}" class="btn btn-sm btn-outline-warning me-1 py-0 px-1" data-bs-toggle="tooltip" title="تعديل">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{{ url_for('print_maintenance', record_id=record.id) }}" class="btn btn-sm btn-outline-info py-0 px-1" target="_blank" data-bs-toggle="tooltip" title="طباعة">
-                                        <i class="fas fa-print"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="text-center py-5">
-                <img src="https://cdn-icons-png.flaticon.com/512/5058/5058432.png" alt="No maintenance records" style="width: 100px; opacity: 0.5;" class="mb-3">
-                <h5 class="text-muted">لا توجد سجلات صيانة لهذا الجهاز</h5>
-                <p class="text-muted">يمكنك إضافة سجل صيانة جديد من خلال الضغط على زر "إضافة سجل صيانة"</p>
-                <a href="{{ url_for('add_maintenance', device_id=device.id) }}" class="btn btn-primary mt-2">
-                    <i class="fas fa-plus-circle me-1"></i> إضافة سجل صيانة
-                </a>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Navigation Buttons -->
-    <div class="d-flex justify-content-between mb-3">
-        <a href="{{ url_for('devices') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-1"></i> العودة إلى قائمة الأجهزة
-        </a>
-        {% if prev_device %}
-        <a href="{{ url_for('device_details', device_id=prev_device.id) }}" class="btn btn-outline-primary">
-            <i class="fas fa-chevron-right me-1"></i> الجهاز السابق: {{ prev_device.name }}
-        </a>
-        {% endif %}
-        {% if next_device %}
-        <a href="{{ url_for('device_details', device_id=next_device.id) }}" class="btn btn-outline-primary">
-            الجهاز التالي: {{ next_device.name }} <i class="fas fa-chevron-left ms-1"></i>
-        </a>
-        {% endif %}
-    </div>
 </div>
 
-<!-- Initialize tooltips -->
+<style>
+    .icon-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .avatar-circle {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .device-icon-large {
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+    }
+    
+    .info-group {
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .info-group:hover {
+        transform: translateX(5px);
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .empty-state-icon {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(0.95);
+            opacity: 0.7;
+        }
+        50% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(0.95);
+            opacity: 0.7;
+        }
+    }
+</style>
+
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -261,3 +320,52 @@
 </script>
 {% endblock %}
 {% endblock %}
+
+<!-- Add this to the tabs section -->
+<li class="nav-item" role="presentation">
+    <button class="nav-link" id="ownership-tab" data-bs-toggle="tab" data-bs-target="#ownership" type="button" role="tab" aria-controls="ownership" aria-selected="false">
+        <i class="fas fa-exchange-alt me-1"></i> Historique des Propriétaires
+    </button>
+</li>
+
+<!-- Add this to the tab content section -->
+<div class="tab-pane fade" id="ownership" role="tabpanel" aria-labelledby="ownership-tab">
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">Historique des Changements de Propriétaire</h5>
+            <a href="{{ url_for('ownership_history', device_id=device.id) }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-external-link-alt me-1"></i> Vue Complète
+            </a>
+        </div>
+        <div class="card-body">
+            {% if device.ownership_changes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Ancien Propriétaire</th>
+                                <th>Nouveau Propriétaire</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for change in device.ownership_changes|sort(attribute='change_date', reverse=True) %}
+                            <tr>
+                                <td>{{ change.change_date.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>{{ change.previous_owner }}</td>
+                                <td>{{ change.new_owner }}</td>
+                                <td>{{ change.notes }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i> Aucun changement de propriétaire enregistré pour cet appareil.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
