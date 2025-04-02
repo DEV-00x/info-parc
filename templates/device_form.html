@@ -17,21 +17,21 @@
                 <span class="icon-circle bg-{{ 'warning' if device.id else 'primary' }} text-white me-3">
                     <i class="fas fa-{{ 'edit' if device.id else 'plus-circle' }}"></i>
                 </span>
-                {{ 'Modifier' if device.id else 'Ajouter' }} un Appareil
+                <span class="text-truncate">{{ 'Modifier' if device.id else 'Ajouter' }} un Appareil</span>
             </h4>
         </div>
-        <div class="card-body p-4">
+        <div class="card-body p-4 p-md-4 p-sm-3 p-2">
             <form method="POST" action="{{ url_for('edit_device', device_id=device.id) if device.id else url_for('add_device') }}">
-                <div class="row g-4">
+                <div class="row g-4 g-md-4 g-sm-3 g-2">
                     <!-- Basic Information -->
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <div class="card h-100 border-0 bg-light">
                             <div class="card-body">
                                 <h5 class="card-title mb-4 pb-2 border-bottom">
                                     <i class="fas fa-info-circle me-2 text-primary"></i>Informations de Base
                                 </h5>
                                 
-                                <div class="mb-4">
+                                <div class="mb-3 mb-md-4">
                                     <label for="name" class="form-label fw-bold">Nom de l'Appareil <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-tag text-primary"></i></span>
@@ -39,7 +39,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="mb-4">
+                                <div class="mb-3 mb-md-4">
                                     <label for="type" class="form-label fw-bold">Type d'Appareil <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-laptop text-primary"></i></span>
@@ -55,7 +55,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="mb-4">
+                                <div class="mb-3 mb-md-4">
                                     <label for="serial_number" class="form-label fw-bold">Numéro de Série <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-barcode text-primary"></i></span>
@@ -63,7 +63,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="mb-4">
+                                <div class="mb-3 mb-md-4">
                                     <label for="status" class="form-label fw-bold">Statut <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-check-circle text-primary"></i></span>
@@ -75,7 +75,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="mb-4">
+                                <div class="mb-3 mb-md-4">
                                     <label for="service" class="form-label fw-bold">Service</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-briefcase text-primary"></i></span>
@@ -95,14 +95,14 @@
                     </div>
                     
                     <!-- Additional Information Section -->
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <div class="card h-100 border-0 bg-light">
                             <div class="card-body">
                                 <h5 class="card-title mb-4 pb-2 border-bottom">
                                     <i class="fas fa-cogs me-2 text-primary"></i>Informations Supplémentaires
                                 </h5>
                                 
-                                <div class="mb-4">
+                                <div class="mb-3 mb-md-4">
                                     <label for="owner" class="form-label fw-bold">Responsable</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-user-tie text-primary"></i></span>
@@ -110,7 +110,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="mb-4">
+                                <div class="mb-3 mb-md-4">
                                     <label for="department" class="form-label fw-bold">Département</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-building text-primary"></i></span>
@@ -125,7 +125,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="mb-4">
+                                <div class="mb-3 mb-md-4">
                                     <label for="assigned_to" class="form-label fw-bold">Assigné à</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-user text-primary"></i></span>
@@ -133,16 +133,16 @@
                                     </div>
                                 </div>
                                 
-                                <div class="mb-4">
+                                <div class="mb-3 mb-md-4">
                                     <label for="mac_address" class="form-label fw-bold">Adresse MAC</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-network-wired text-primary"></i></span>
                                         <input type="text" class="form-control" id="mac_address" name="mac_address" value="{{ device.mac_address }}" pattern="([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})" placeholder="XX:XX:XX:XX:XX:XX">
                                     </div>
-                                    <div class="form-text ms-4">Format: XX:XX:XX:XX:XX:XX</div>
+                                    <div class="form-text ms-4 small">Format: XX:XX:XX:XX:XX:XX</div>
                                 </div>
                                 
-                                <div class="mb-4">
+                                <div class="mb-3 mb-md-4">
                                     <label for="notes" class="form-label fw-bold">Notes</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-sticky-note text-primary"></i></span>
@@ -154,11 +154,11 @@
                     </div>
                 </div>
                 
-                <div class="d-flex justify-content-end mt-4">
-                    <a href="{{ url_for('devices') }}" class="btn btn-outline-secondary me-2">
+                <div class="d-flex flex-column flex-sm-row justify-content-end mt-4 gap-2">
+                    <a href="{{ url_for('devices') }}" class="btn btn-outline-secondary mb-2 mb-sm-0 w-100 w-sm-auto">
                         <i class="fas fa-times me-1"></i> Annuler
                     </a>
-                    <button type="submit" class="btn btn-primary px-4">
+                    <button type="submit" class="btn btn-primary w-100 w-sm-auto">
                         <i class="fas fa-save me-1"></i> {{ 'Mettre à jour' if device.id else 'Enregistrer' }}
                     </button>
                 </div>
@@ -168,26 +168,66 @@
 </div>
 
 <style>
-    .icon-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    @media (max-width: 768px) {
+        .icon-circle {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+        }
+        
+        .card-header h4 {
+            font-size: 1.2rem;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+        }
+        
+        .form-label {
+            font-size: 0.9rem;
+        }
+        
+        .input-group-text {
+            padding: 0.375rem 0.5rem;
+        }
+        
+        .breadcrumb {
+            font-size: 0.85rem;
+        }
+        
+        .form-text {
+            font-size: 0.7rem;
+        }
     }
     
-    .bg-gradient-light {
-        background: linear-gradient(to right, #f8f9fa, #e9ecef);
-    }
-    
-    .card {
-        transition: transform 0.2s;
-    }
-    
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    @media (max-width: 576px) {
+        .icon-circle {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            margin-right: 0.5rem !important;
+        }
+        
+        .card-header h4 {
+            font-size: 1.1rem;
+        }
+        
+        .card-title {
+            font-size: 1rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .breadcrumb {
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .form-control, .form-select, .input-group-text {
+            font-size: 0.9rem;
+        }
     }
 </style>
 {% endblock %}
