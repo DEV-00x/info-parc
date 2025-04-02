@@ -61,7 +61,8 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted mb-1 small">Appareils Actifs</p>
-                        <h3 class="counter mb-0 fw-bold">{{ active_devices }}</h3>
+                        <!-- For active devices counter -->
+                        <h3 class="counter mb-0 fw-bold" data-count="{{ active_devices }}">0</h3>
                     </div>
                     <div class="icon-circle bg-success">
                         <i class="fas fa-check-circle fa-lg text-white"></i>
@@ -306,19 +307,24 @@
         // Initialize counters with animation
         const counters = document.querySelectorAll('.counter');
         counters.forEach(counter => {
-            const target = parseInt(counter.innerText);
-            const count = function() {
-                const start = 0;
-                const increment = target / 20;
-                
+            const target = parseInt(counter.getAttribute('data-count') || counter.innerText);
+            let start = 0;
+            const duration = 1000; // Animation duration in milliseconds
+            const frameDuration = 1000/60; // 60fps
+            const totalFrames = Math.round(duration/frameDuration);
+            const increment = target / totalFrames;
+            
+            const animate = () => {
+                start += increment;
                 if (start < target) {
-                    counter.innerText = Math.ceil(start + increment);
-                    setTimeout(count, 50);
+                    counter.innerText = Math.floor(start);
+                    requestAnimationFrame(animate);
                 } else {
                     counter.innerText = target;
                 }
             };
-            count();
+            
+            animate();
         });
     });
 </script>
