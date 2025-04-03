@@ -1,233 +1,85 @@
-{% extends "layout.html" %}
-{% block content %}
-<div class="container-fluid px-0">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Accueil</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('devices') }}">Appareils</a></li>
-            <li class="breadcrumb-item active">{{ 'Modifier' if device.id else 'Ajouter' }} un Appareil</li>
-        </ol>
-    </nav>
+{% extends "base.html" %}
+{% block title %}{{ 'Modifier' if device.id else 'Ajouter' }} Appareil{% endblock %}
 
-    <!-- Form Card -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-gradient-light py-3">
-            <h4 class="mb-0 d-flex align-items-center">
-                <span class="icon-circle bg-{{ 'warning' if device.id else 'primary' }} text-white me-3">
-                    <i class="fas fa-{{ 'edit' if device.id else 'plus-circle' }}"></i>
-                </span>
-                <span class="text-truncate">{{ 'Modifier' if device.id else 'Ajouter' }} un Appareil</span>
-            </h4>
-        </div>
-        <div class="card-body p-4 p-md-4 p-sm-3 p-2">
-            <form method="POST" action="{{ url_for('edit_device', device_id=device.id) if device.id else url_for('add_device') }}">
-                <div class="row g-4 g-md-4 g-sm-3 g-2">
-                    <!-- Basic Information -->
-                    <div class="col-12 col-md-6">
-                        <div class="card h-100 border-0 bg-light">
-                            <div class="card-body">
-                                <h5 class="card-title mb-4 pb-2 border-bottom">
-                                    <i class="fas fa-info-circle me-2 text-primary"></i>Informations de Base
-                                </h5>
-                                
-                                <div class="mb-3 mb-md-4">
-                                    <label for="name" class="form-label fw-bold">Nom de l'Appareil <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-tag text-primary"></i></span>
-                                        <input type="text" class="form-control" id="name" name="name" value="{{ device.name }}" required>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3 mb-md-4">
-                                    <label for="type" class="form-label fw-bold">Type d'Appareil <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-laptop text-primary"></i></span>
-                                        <select class="form-select" id="type" name="type" required>
-                                            <option value="">Sélectionner un type</option>
-                                            <option value="ordinateur de bureau" {{ 'selected' if device.type == 'ordinateur de bureau' }}>Ordinateur de Bureau</option>
-                                            <option value="ordinateur portable" {{ 'selected' if device.type == 'ordinateur portable' }}>Ordinateur Portable</option>
-                                            <option value="imprimante" {{ 'selected' if device.type == 'imprimante' }}>Imprimante</option>
-                                            <option value="scanner" {{ 'selected' if device.type == 'scanner' }}>Scanner</option>
-                                            <option value="serveur" {{ 'selected' if device.type == 'serveur' }}>Serveur</option>
-                                            <option value="autre" {{ 'selected' if device.type == 'autre' }}>Autre</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3 mb-md-4">
-                                    <label for="serial_number" class="form-label fw-bold">Numéro de Série <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-barcode text-primary"></i></span>
-                                        <input type="text" class="form-control" id="serial_number" name="serial_number" value="{{ device.serial_number }}" required>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3 mb-md-4">
-                                    <label for="status" class="form-label fw-bold">Statut <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-check-circle text-primary"></i></span>
-                                        <select class="form-select" id="status" name="status" required>
-                                            <option value="actif" {{ 'selected' if device.status == 'actif' }}>Actif</option>
-                                            <option value="en maintenance" {{ 'selected' if device.status == 'en maintenance' }}>En Maintenance</option>
-                                            <option value="inactif" {{ 'selected' if device.status == 'inactif' }}>Inactif</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3 mb-md-4">
-                                    <label for="service" class="form-label fw-bold">Service</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-briefcase text-primary"></i></span>
-                                        <input type="text" class="form-control" id="service" name="service" value="{{ device.service }}" list="services">
-                                        <datalist id="services">
-                                            <option value="Informatique">
-                                            <option value="Comptabilité">
-                                            <option value="Ressources Humaines">
-                                            <option value="Marketing">
-                                            <option value="Production">
-                                            <option value="Logistique">
-                                        </datalist>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Additional Information Section -->
-                    <div class="col-12 col-md-6">
-                        <div class="card h-100 border-0 bg-light">
-                            <div class="card-body">
-                                <h5 class="card-title mb-4 pb-2 border-bottom">
-                                    <i class="fas fa-cogs me-2 text-primary"></i>Informations Supplémentaires
-                                </h5>
-                                
-                                <div class="mb-3 mb-md-4">
-                                    <label for="owner" class="form-label fw-bold">Responsable</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-user-tie text-primary"></i></span>
-                                        <input type="text" class="form-control" id="owner" name="owner" value="{{ device.owner }}">
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3 mb-md-4">
-                                    <label for="department" class="form-label fw-bold">Département</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-building text-primary"></i></span>
-                                        <input type="text" class="form-control" id="department" name="department" value="{{ device.department }}" list="departments">
-                                        <datalist id="departments">
-                                            <option value="Administration">
-                                            <option value="Technique">
-                                            <option value="Commercial">
-                                            <option value="Support">
-                                            <option value="Développement">
-                                        </datalist>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3 mb-md-4">
-                                    <label for="assigned_to" class="form-label fw-bold">Assigné à</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-user text-primary"></i></span>
-                                        <input type="text" class="form-control" id="assigned_to" name="assigned_to" value="{{ device.assigned_to }}">
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3 mb-md-4">
-                                    <label for="mac_address" class="form-label fw-bold">Adresse MAC</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-network-wired text-primary"></i></span>
-                                        <input type="text" class="form-control" id="mac_address" name="mac_address" value="{{ device.mac_address }}" pattern="([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})" placeholder="XX:XX:XX:XX:XX:XX">
-                                    </div>
-                                    <div class="form-text ms-4 small">Format: XX:XX:XX:XX:XX:XX</div>
-                                </div>
-                                
-                                <div class="mb-3 mb-md-4">
-                                    <label for="notes" class="form-label fw-bold">Notes</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-sticky-note text-primary"></i></span>
-                                        <textarea class="form-control" id="notes" name="notes" rows="3">{{ device.notes }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>{{ 'Modifier' if device.id else 'Ajouter' }} un Appareil</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom de l'Appareil</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ device.name or '' }}" required>
                     </div>
                 </div>
-                
-                <div class="d-flex flex-column flex-sm-row justify-content-end mt-4 gap-2">
-                    <a href="{{ url_for('devices') }}" class="btn btn-outline-secondary mb-2 mb-sm-0 w-100 w-sm-auto">
-                        <i class="fas fa-times me-1"></i> Annuler
-                    </a>
-                    <button type="submit" class="btn btn-primary w-100 w-sm-auto">
-                        <i class="fas fa-save me-1"></i> {{ 'Mettre à jour' if device.id else 'Enregistrer' }}
-                    </button>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Type</label>
+                        <input type="text" class="form-control" id="type" name="type" value="{{ device.type or '' }}" required>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="serial_number" class="form-label">Numéro de Série</label>
+                        <input type="text" class="form-control" id="serial_number" name="serial_number" value="{{ device.serial_number or '' }}" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Statut</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="actif" {% if device.status == 'actif' %}selected{% endif %}>Actif</option>
+                            <option value="en maintenance" {% if device.status == 'en maintenance' %}selected{% endif %}>En Maintenance</option>
+                            <option value="inactif" {% if device.status == 'inactif' %}selected{% endif %}>Inactif</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="assigned_to" class="form-label">Assigné à</label>
+                        <input type="text" class="form-control" id="assigned_to" name="assigned_to" value="{{ device.assigned_to or '' }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="service" class="form-label">Service</label>
+                        <input type="text" class="form-control" id="service" name="service" value="{{ device.service or '' }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="department" class="form-label">Département</label>
+                        <input type="text" class="form-control" id="department" name="department" value="{{ device.department or '' }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="mac_address" class="form-label">Adresse MAC</label>
+                        <input type="text" class="form-control" id="mac_address" name="mac_address" value="{{ device.mac_address or '' }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea class="form-control" id="notes" name="notes" rows="3">{{ device.notes or '' }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">{{ 'Modifier' if device.id else 'Ajouter' }}</button>
+            <a href="{{ url_for('devices') }}" class="btn btn-secondary">Annuler</a>
+        </form>
     </div>
 </div>
-
-<style>
-    @media (max-width: 768px) {
-        .icon-circle {
-            width: 36px;
-            height: 36px;
-            min-width: 36px;
-        }
-        
-        .card-header h4 {
-            font-size: 1.2rem;
-        }
-        
-        .card-title {
-            font-size: 1.1rem;
-        }
-        
-        .form-label {
-            font-size: 0.9rem;
-        }
-        
-        .input-group-text {
-            padding: 0.375rem 0.5rem;
-        }
-        
-        .breadcrumb {
-            font-size: 0.85rem;
-        }
-        
-        .form-text {
-            font-size: 0.7rem;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .icon-circle {
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
-            margin-right: 0.5rem !important;
-        }
-        
-        .card-header h4 {
-            font-size: 1.1rem;
-        }
-        
-        .card-title {
-            font-size: 1rem;
-        }
-        
-        .card-body {
-            padding: 1rem;
-        }
-        
-        .breadcrumb {
-            font-size: 0.8rem;
-            margin-bottom: 0.5rem !important;
-        }
-        
-        .form-control, .form-select, .input-group-text {
-            font-size: 0.9rem;
-        }
-    }
-</style>
 {% endblock %}

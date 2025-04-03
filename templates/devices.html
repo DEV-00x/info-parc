@@ -1,439 +1,70 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
+{% block title %}Appareils{% endblock %}
+
 {% block content %}
-<div class="container-fluid px-0">
-    <!-- Header Section with Stats -->
-    <div class="row mb-3">
-        <div class="col-md-12">
-            <div class="card shadow-sm border-0 bg-gradient-primary text-white">
-                <div class="card-body py-3">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-                        <div class="mb-3 mb-md-0">
-                            <h2 class="mb-0"><i class="fas fa-laptop me-2"></i>Liste des Appareils</h2>
-                            <p class="mb-0 opacity-75">Gérer et afficher tous les appareils du système</p>
-                        </div>
-                        <div class="d-flex flex-wrap">
-                            <a href="{{ url_for('add_device') }}" class="btn btn-light me-2 mb-2 mb-sm-0">
-                                <i class="fas fa-plus-circle me-1"></i> Ajouter
-                            </a>
-                            <a href="{{ url_for('export_devices_excel') }}" class="btn btn-outline-light">
-                                <i class="fas fa-file-excel me-1"></i> Exporter
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Liste des Appareils</h1>
+    <div>
+        <a href="{{ url_for('add_device') }}" class="btn btn-primary">Ajouter un Appareil</a>
+        <a href="{{ url_for('export_devices_excel') }}" class="btn btn-success">Exporter Excel</a>
     </div>
-
-    <!-- Quick Stats Cards -->
-    <div class="row mb-3">
-        <div class="col-6 col-md-3 mb-2">
-            <div class="card shadow-sm h-100 border-0 stats-card">
-                <div class="card-body py-2 py-md-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1 small">Total</h6>
-                            <h3 class="mb-0 fw-bold" id="total-devices">{{ devices|length }}</h3>
-                        </div>
-                        <div class="icon-circle bg-primary">
-                            <i class="fas fa-laptop fa-lg text-white"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3 mb-2">
-            <div class="card shadow-sm h-100 border-0 stats-card">
-                <div class="card-body py-2 py-md-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1 small">Actifs</h6>
-                            <h3 class="mb-0 fw-bold" id="active-devices">0</h3>
-                        </div>
-                        <div class="icon-circle bg-success">
-                            <i class="fas fa-check-circle fa-lg text-white"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3 mb-2">
-            <div class="card shadow-sm h-100 border-0 stats-card">
-                <div class="card-body py-2 py-md-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1 small">Maintenance</h6>
-                            <h3 class="mb-0 fw-bold" id="maintenance-devices">0</h3>
-                        </div>
-                        <div class="icon-circle bg-warning">
-                            <i class="fas fa-tools fa-lg text-white"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3 mb-2">
-            <div class="card shadow-sm h-100 border-0 stats-card">
-                <div class="card-body py-2 py-md-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1 small">Inactifs</h6>
-                            <h3 class="mb-0 fw-bold" id="inactive-devices">0</h3>
-                        </div>
-                        <div class="icon-circle bg-danger">
-                            <i class="fas fa-times-circle fa-lg text-white"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filters Card -->
-    <div class="card shadow-sm mb-3 border-0">
-        <div class="card-header bg-white py-2 py-md-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold"><i class="fas fa-filter me-2 text-primary"></i>Filtrer</h5>
-                <button class="btn btn-sm btn-outline-secondary" id="reset-filters">
-                    <i class="fas fa-redo me-1"></i>Réinitialiser
-                </button>
-            </div>
-        </div>
-        <div class="card-body py-2 py-md-3">
-            <div class="row g-2">
-                <div class="col-6 col-md-3">
-                    <label for="type-filter" class="form-label small">Type d'Appareil</label>
-                    <select id="type-filter" class="form-select form-select-sm">
-                        <option value="">Tous les Types</option>
-                        <option value="ordinateur de bureau">Ordinateur de Bureau</option>
-                        <option value="ordinateur portable">Ordinateur Portable</option>
-                        <option value="imprimante">Imprimante</option>
-                        <option value="scanner">Scanner</option>
-                        <option value="routeur">Routeur</option>
-                        <option value="switch">Switch</option>
-                        <option value="serveur">Serveur</option>
-                        <option value="autre">Autre</option>
-                    </select>
-                </div>
-                <div class="col-6 col-md-3">
-                    <label for="status-filter" class="form-label small">Statut</label>
-                    <select id="status-filter" class="form-select form-select-sm">
-                        <option value="">Tous les Statuts</option>
-                        <option value="actif">Actif</option>
-                        <option value="inactif">Inactif</option>
-                        <option value="en maintenance">En Maintenance</option>
-                    </select>
-                </div>
-                <div class="col-6 col-md-3">
-                    <label for="location-filter" class="form-label small">Emplacement</label>
-                    <select id="location-filter" class="form-select form-select-sm">
-                        <option value="">Tous les Emplacements</option>
-                        {% set locations = [] %}
-                        {% for device in devices %}
-                            {% if device.location and device.location not in locations %}
-                                {% set _ = locations.append(device.location) %}
-                                <option value="{{ device.location }}">{{ device.location }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-6 col-md-3">
-                    <label for="search-input" class="form-label small">Rechercher</label>
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" id="search-input" class="form-control" placeholder="Rechercher...">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Devices Table Card -->
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" id="devices-table">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Nom</th>
-                            <th>Type</th>
-                            <th class="d-none d-md-table-cell">Numéro de Série</th>
-                            <th>Statut</th>
-                            <th class="d-none d-md-table-cell">Emplacement</th>
-                            <th class="d-none d-md-table-cell">Assigné à</th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for device in devices %}
-                        <tr data-type="{{ device.type }}" data-status="{{ device.status }}" data-location="{{ device.location }}">
-                            <td>{{ device.id }}</td>
-                            <td class="fw-medium">{{ device.name }}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    {% if device.type == 'ordinateur de bureau' %}
-                                        <i class="fas fa-desktop text-primary me-2"></i>
-                                    {% elif device.type == 'ordinateur portable' %}
-                                        <i class="fas fa-laptop text-primary me-2"></i>
-                                    {% elif device.type == 'imprimante' %}
-                                        <i class="fas fa-print text-primary me-2"></i>
-                                    {% elif device.type == 'scanner' %}
-                                        <i class="fas fa-scanner text-primary me-2"></i>
-                                    {% elif device.type == 'routeur' %}
-                                        <i class="fas fa-network-wired text-primary me-2"></i>
-                                    {% elif device.type == 'switch' %}
-                                        <i class="fas fa-ethernet text-primary me-2"></i>
-                                    {% elif device.type == 'serveur' %}
-                                        <i class="fas fa-server text-primary me-2"></i>
-                                    {% else %}
-                                        <i class="fas fa-hdd text-primary me-2"></i>
-                                    {% endif %}
-                                    <span class="d-none d-md-inline">{{ device.type }}</span>
-                                </div>
-                            </td>
-                            <td class="d-none d-md-table-cell">{{ device.serial_number }}</td>
-                            <td>
-                                <span class="badge rounded-pill bg-{{ 'success' if device.status == 'actif' else 'warning' if device.status == 'en maintenance' else 'danger' }}">
-                                    {{ device.status }}
-                                </span>
-                            </td>
-                            <td class="d-none d-md-table-cell">
-                                {% if device.location %}
-                                    <i class="fas fa-map-marker-alt me-1 text-muted"></i> {{ device.location }}
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
-                            </td>
-                            <td class="d-none d-md-table-cell">
-                                {% if device.assigned_to %}
-                                    <i class="fas fa-user me-1 text-muted"></i> {{ device.assigned_to }}
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="d-flex justify-content-center">
-                                    <a href="{{ url_for('device_details', device_id=device.id) }}" class="btn btn-sm btn-primary me-1" data-bs-toggle="tooltip" title="Voir Détails">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ url_for('edit_device', device_id=device.id) }}" class="btn btn-sm btn-warning me-1" data-bs-toggle="tooltip" title="Modifier">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{{ url_for('add_maintenance', device_id=device.id) }}" class="btn btn-sm btn-info me-1 d-none d-md-inline-block" data-bs-toggle="tooltip" title="Ajouter Maintenance">
-                                        <i class="fas fa-tools"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Empty State -->
-            <div id="empty-state" class="text-center py-4 d-none">
-                <img src="https://cdn-icons-png.flaticon.com/512/5058/5058432.png" alt="Aucun appareil" style="width: 80px; opacity: 0.5;" class="mb-2">
-                <h6 class="text-muted">Aucun appareil ne correspond à votre recherche</h6>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Conditional content for filtered view -->
-    {% if filtered_by_assigned %}
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">{{ title }}</h4>
-        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Retour
-        </a>
-    </div>
-    {% endif %}
 </div>
-{% endblock %}
 
-{% block scripts %}
-<script>
-    // Table Filter Class
-    class TableFilter {
-        constructor(options) {
-            this.tableId = options.tableId;
-            this.emptyStateId = options.emptyStateId;
-            this.filterSelectors = options.filterSelectors;
-            this.searchSelector = options.searchSelector;
-            this.resetSelector = options.resetSelector;
-            this.dataAttributes = options.dataAttributes;
-            this.statsCounters = options.statsCounters;
-            
-            this.table = document.getElementById(this.tableId);
-            this.emptyState = document.getElementById(this.emptyStateId);
-            this.rows = this.table.querySelectorAll('tbody tr');
-            
-            this.initCounters();
-            this.initEventListeners();
-            this.checkMobileView();
-        }
-        
-        initCounters() {
-            // Count devices by status
-            let activeCount = 0;
-            let maintenanceCount = 0;
-            let inactiveCount = 0;
-            
-            this.rows.forEach(row => {
-                const status = row.getAttribute('data-status');
-                if (status === 'actif') activeCount++;
-                else if (status === 'en maintenance') maintenanceCount++;
-                else if (status === 'inactif') inactiveCount++;
-            });
-            
-            // Update counters
-            if (this.statsCounters.active) {
-                document.getElementById(this.statsCounters.active).textContent = activeCount;
-            }
-            if (this.statsCounters.maintenance) {
-                document.getElementById(this.statsCounters.maintenance).textContent = maintenanceCount;
-            }
-            if (this.statsCounters.inactive) {
-                document.getElementById(this.statsCounters.inactive).textContent = inactiveCount;
-            }
-        }
-        
-        initEventListeners() {
-            // Add event listeners for filters
-            for (const [key, selector] of Object.entries(this.filterSelectors)) {
-                const element = document.querySelector(selector);
-                if (element) {
-                    element.addEventListener('change', () => this.filterTable());
-                }
-            }
-            
-            // Add event listener for search
-            const searchInput = document.querySelector(this.searchSelector);
-            if (searchInput) {
-                searchInput.addEventListener('input', () => this.filterTable());
-            }
-            
-            // Add event listener for reset button
-            const resetButton = document.querySelector(this.resetSelector);
-            if (resetButton) {
-                resetButton.addEventListener('click', () => this.resetFilters());
-            }
-            
-            // Add resize listener for responsive adjustments
-            window.addEventListener('resize', () => this.checkMobileView());
-        }
-        
-        checkMobileView() {
-            // Add any specific mobile view adjustments here
-            if (window.innerWidth < 768) {
-                // Mobile specific adjustments
-                document.querySelectorAll('.btn-sm').forEach(btn => {
-                    btn.classList.add('btn-xs');
-                });
-            } else {
-                document.querySelectorAll('.btn-xs').forEach(btn => {
-                    btn.classList.remove('btn-xs');
-                });
-            }
-        }
-        
-        filterTable() {
-            let visibleCount = 0;
-            
-            // Get filter values
-            const filters = {};
-            for (const [key, selector] of Object.entries(this.filterSelectors)) {
-                const element = document.querySelector(selector);
-                if (element) {
-                    filters[key] = element.value.toLowerCase();
-                }
-            }
-            
-            // Get search value
-            const searchValue = document.querySelector(this.searchSelector)?.value.toLowerCase() || '';
-            
-            // Filter rows
-            this.rows.forEach(row => {
-                let visible = true;
-                
-                // Apply data attribute filters
-                for (const [key, attribute] of Object.entries(this.dataAttributes)) {
-                    if (filters[key] && row.getAttribute(attribute)?.toLowerCase() !== filters[key]) {
-                        visible = false;
-                        break;
-                    }
-                }
-                
-                // Apply search filter if row is still visible
-                if (visible && searchValue) {
-                    visible = false;
-                    const textContent = row.textContent.toLowerCase();
-                    if (textContent.includes(searchValue)) {
-                        visible = true;
-                    }
-                }
-                
-                // Show/hide row
-                row.style.display = visible ? '' : 'none';
-                if (visible) visibleCount++;
-            });
-            
-            // Show/hide empty state
-            if (this.emptyState) {
-                this.emptyState.classList.toggle('d-none', visibleCount > 0);
-            }
-        }
-        
-        resetFilters() {
-            // Reset filter inputs
-            for (const selector of Object.values(this.filterSelectors)) {
-                const element = document.querySelector(selector);
-                if (element) {
-                    element.value = '';
-                }
-            }
-            
-            // Reset search input
-            const searchInput = document.querySelector(this.searchSelector);
-            if (searchInput) {
-                searchInput.value = '';
-            }
-            
-            // Show all rows
-            this.rows.forEach(row => {
-                row.style.display = '';
-            });
-            
-            // Hide empty state
-            if (this.emptyState) {
-                this.emptyState.classList.add('d-none');
-            }
-        }
-    }
-    
-    // Initialize table filter
-    document.addEventListener('DOMContentLoaded', function() {
-        const deviceFilter = new TableFilter({
-            tableId: 'devices-table',
-            emptyStateId: 'empty-state',
-            filterSelectors: {
-                type: '#type-filter',
-                status: '#status-filter',
-                location: '#location-filter'
-            },
-            searchSelector: '#search-input',
-            resetSelector: '#reset-filters',
-            dataAttributes: {
-                type: 'data-type',
-                status: 'data-status',
-                location: 'data-location'
-            },
-            statsCounters: {
-                active: 'active-devices',
-                maintenance: 'maintenance-devices',
-                inactive: 'inactive-devices'
-            }
-        });
-    });
-</script>
+<div class="mb-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="tableFilter" class="form-control" placeholder="Rechercher par nom, type, numéro de série...">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" id="statusFilter">
+                <option value="">Tous les statuts</option>
+                <option value="actif">Actif</option>
+                <option value="en maintenance">En Maintenance</option>
+                <option value="inactif">Inactif</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>N° Série</th>
+                <th>Statut</th>
+                <th>Assigné à</th>
+                <th>Service</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for device in devices %}
+            <tr>
+                <td>{{ device.name }}</td>
+                <td>{{ device.type }}</td>
+                <td>{{ device.serial_number }}</td>
+                <td>
+                    <span class="badge bg-{{ 'success' if device.status == 'actif' else 'warning' if device.status == 'en maintenance' else 'danger' }}">
+                        {{ device.status }}
+                    </span>
+                </td>
+                <td>{{ device.assigned_to or '-' }}</td>
+                <td>{{ device.service or '-' }}</td>
+                <td>
+                    <a href="{{ url_for('device_details', device_id=device.id) }}" class="btn btn-sm btn-info">Détails</a>
+                    <a href="{{ url_for('edit_device', device_id=device.id) }}" class="btn btn-sm btn-warning">Modifier</a>
+                    <a href="{{ url_for('delete_device', device_id=device.id) }}" class="btn btn-sm btn-danger delete-confirm">Supprimer</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

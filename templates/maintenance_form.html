@@ -1,292 +1,87 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
+{% block title %}{{ 'Modifier' if record else 'Ajouter' }} Maintenance{% endblock %}
+
 {% block content %}
-<div class="container-fluid px-0">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Accueil</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('maintenance') }}">Maintenance</a></li>
-            <li class="breadcrumb-item active">{{ 'Modifier' if record.id else 'Ajouter' }} un Registre</li>
-        </ol>
-    </nav>
+<div class="card">
+    <div class="card-header">
+        <h2>{{ 'Modifier' if record else 'Ajouter' }} une Maintenance</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="mb-3">
+                <label for="device_id" class="form-label">Appareil</label>
+                <select name="device_id" id="device_id" class="form-select" required {% if device_id %}disabled{% endif %}>
+                    {% for device in devices %}
+                    <option value="{{ device.id }}" {% if device_id == device.id or (record and record.device_id == device.id) %}selected{% endif %}>
+                        {{ device.name }} ({{ device.serial_number }})
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if device_id %}
+                <input type="hidden" name="device_id" value="{{ device_id }}">
+                {% endif %}
+            </div>
 
-    <!-- Form Card -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-gradient-warning text-white py-3">
-            <h4 class="mb-0 d-flex align-items-center">
-                <span class="icon-circle bg-white text-warning me-3">
-                    <i class="fas fa-{{ 'edit' if record.id else 'plus-circle' }}"></i>
-                </span>
-                {{ 'Modifier' if record.id else 'Ajouter' }} un Registre de Maintenance
-            </h4>
-        </div>
-        <div class="card-body p-4">
-            <form method="POST" action="{{ url_for('edit_maintenance', record_id=record.id) if record.id else url_for('add_maintenance') }}">
-                <div class="row g-4">
-                    <!-- Basic Information -->
-                    <div class="col-12 col-md-6">
-                        <div class="card h-100 border-0 bg-light">
-                            <div class="card-body">
-                                <h5 class="card-title mb-4 pb-2 border-bottom">
-                                    <i class="fas fa-clipboard-list me-2 text-warning"></i>Informations de Base
-                                </h5>
-                                
-                                <div class="mb-4">
-                                    <label for="device_id" class="form-label fw-bold">Appareil <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-laptop text-warning"></i></span>
-                                        <select class="form-select" id="device_id" name="device_id" required {{ 'disabled' if device_id }}>
-                                            <option value="">Sélectionner un appareil</option>
-                                            {% for device in devices %}
-                                                <option value="{{ device.id }}" {{ 'selected' if (record.device_id == device.id) or (device_id and device_id == device.id) }}>
-                                                    {{ device.name }} ({{ device.type }}) - {{ device.serial_number }}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    {% if device_id %}
-                                        <input type="hidden" name="device_id" value="{{ device_id }}">
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <label for="maintenance_date" class="form-label fw-bold">Date de Maintenance <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-calendar-alt text-warning"></i></span>
-                                        <input type="date" class="form-control" id="maintenance_date" name="maintenance_date" value="{{ record.maintenance_date.strftime('%Y-%m-%d') if record.maintenance_date else today }}" required>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <label for="issue_description" class="form-label fw-bold">Description du Problème <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-exclamation-circle text-warning"></i></span>
-                                        <textarea class="form-control" id="issue_description" name="issue_description" rows="3" required>{{ record.issue_description }}</textarea>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <label for="status" class="form-label fw-bold">Statut <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-tasks text-warning"></i></span>
-                                        <select class="form-select" id="status" name="status" required>
-                                            <option value="en attente" {{ 'selected' if record.status == 'en attente' }}>En Attente</option>
-                                            <option value="en cours" {{ 'selected' if record.status == 'en cours' }}>En Cours</option>
-                                            <option value="terminé" {{ 'selected' if record.status == 'terminé' }}>Terminé</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Additional Information -->
-                    <div class="col-12 col-md-6">
-                        <div class="card h-100 border-0 bg-light">
-                            <div class="card-body">
-                                <h5 class="card-title mb-4 pb-2 border-bottom">
-                                    <i class="fas fa-info-circle me-2 text-warning"></i>Informations Supplémentaires
-                                </h5>
-                                
-                                <div class="mb-4">
-                                    <label for="technician" class="form-label fw-bold">Technicien <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-user-cog text-warning"></i></span>
-                                        <input type="text" class="form-control" id="technician" name="technician" value="{{ record.technician }}" required list="technicians">
-                                        <datalist id="technicians">
-                                            {% for technician in technicians %}
-                                                <option value="{{ technician }}">
-                                            {% endfor %}
-                                        </datalist>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <label for="actions_taken" class="form-label fw-bold">Actions Effectuées</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-tools text-warning"></i></span>
-                                        <textarea class="form-control" id="actions_taken" name="actions_taken" rows="3">{{ record.actions_taken }}</textarea>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <label for="completion_date" class="form-label fw-bold">Date d'Achèvement</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-flag-checkered text-warning"></i></span>
-                                        <input type="date" class="form-control" id="completion_date" name="completion_date" value="{{ record.completion_date.strftime('%Y-%m-%d') if record.completion_date }}">
-                                    </div>
-                                    <div class="form-text ms-4">Remplir uniquement si le statut est "Terminé"</div>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <label for="notes" class="form-label fw-bold">Notes</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fas fa-sticky-note text-warning"></i></span>
-                                        <textarea class="form-control" id="notes" name="notes" rows="3">{{ record.notes }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="maintenance_date" class="form-label">Date de Maintenance</label>
+                        <input type="date" class="form-control" id="maintenance_date" name="maintenance_date" 
+                               value="{{ record.maintenance_date.strftime('%Y-%m-%d') if record and record.maintenance_date else today }}" required>
                     </div>
                 </div>
-                
-                <div class="d-flex justify-content-end mt-4">
-                    <a href="{{ url_for('maintenance') }}" class="btn btn-outline-secondary me-2">
-                        <i class="fas fa-times me-1"></i> Annuler
-                    </a>
-                    <button type="submit" class="btn btn-warning px-4">
-                        <i class="fas fa-{{ 'save' if record.id else 'plus' }} me-1"></i>
-                        {{ 'Enregistrer les Modifications' if record.id else 'Ajouter le Registre' }}
-                    </button>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="technician" class="form-label">Technicien</label>
+                        <input type="text" class="form-control" id="technician" name="technician" list="technicians"
+                               value="{{ record.technician if record else '' }}" required>
+                        <datalist id="technicians">
+                            {% for tech in technicians %}
+                            <option value="{{ tech }}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
                 </div>
-            </form>
-        </div>
-        
-        <!-- Remove this duplicate form buttons section -->
-        <!-- <div class="d-flex flex-column flex-sm-row justify-content-between mt-4 gap-3">
-            <a href="{{ url_for('device_details', device_id=device_id) if device_id else url_for('maintenance') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Retour
-            </a>
-            <button type="submit" class="btn btn-warning">
-                <i class="fas fa-save me-2"></i>{{ 'Mettre à jour' if record.id else 'Enregistrer' }}
-            </button>
-        </div> -->
-    </form>
+            </div>
+
+            <div class="mb-3">
+                <label for="issue_description" class="form-label">Description du Problème</label>
+                <textarea class="form-control" id="issue_description" name="issue_description" rows="3" required>{{ record.issue_description if record else '' }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="actions_taken" class="form-label">Actions Effectuées</label>
+                <textarea class="form-control" id="actions_taken" name="actions_taken" rows="3">{{ record.actions_taken if record else '' }}</textarea>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Statut</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="en attente" {% if record and record.status == 'en attente' %}selected{% endif %}>En attente</option>
+                            <option value="en cours" {% if record and record.status == 'en cours' %}selected{% endif %}>En cours</option>
+                            <option value="terminé" {% if record and record.status == 'terminé' %}selected{% endif %}>Terminé</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="completion_date" class="form-label">Date d'Achèvement</label>
+                        <input type="date" class="form-control" id="completion_date" name="completion_date"
+                               value="{{ record.completion_date.strftime('%Y-%m-%d') if record and record.completion_date else '' }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea class="form-control" id="notes" name="notes" rows="2">{{ record.notes if record else '' }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">{{ 'Modifier' if record else 'Ajouter' }}</button>
+            <a href="{{ url_for('device_details', device_id=device_id if device_id else (record.device_id if record else 1)) }}" class="btn btn-secondary">Annuler</a>
+        </form>
+    </div>
 </div>
-
-<style>
-    /* Responsive styles for maintenance form */
-    @media (max-width: 768px) {
-        .card-header h4 {
-            font-size: 1.2rem;
-        }
-        
-        .card-title {
-            font-size: 1.1rem;
-        }
-        
-        .form-label {
-            font-size: 0.9rem;
-        }
-        
-        .input-group-text {
-            padding: 0.375rem 0.5rem;
-        }
-        
-        .form-control, .form-select {
-            font-size: 0.9rem;
-        }
-        
-        .card-body {
-            padding: 1rem !important;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .card-header h4 {
-            font-size: 1.1rem;
-        }
-        
-        .icon-circle {
-            width: 30px;
-            height: 30px;
-            min-width: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .card-title {
-            font-size: 1rem;
-        }
-        
-        .form-label {
-            font-size: 0.85rem;
-        }
-        
-        .input-group-text {
-            padding: 0.25rem 0.4rem;
-        }
-        
-        .form-control, .form-select {
-            font-size: 0.85rem;
-            padding: 0.25rem 0.5rem;
-        }
-        
-        .btn {
-            font-size: 0.85rem;
-            padding: 0.375rem 0.75rem;
-        }
-        
-        .card-body {
-            padding: 0.75rem !important;
-        }
-        
-        .mb-4 {
-            margin-bottom: 1rem !important;
-        }
-        
-        .g-4 {
-            --bs-gutter-y: 1rem;
-        }
-    }
-    
-    /* Fix for text overflow */
-    .text-break {
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
-    }
-    
-    /* Improve form field appearance on mobile */
-    @media (max-width: 576px) {
-        textarea.form-control {
-            min-height: 80px;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Status change handler
-        const statusSelect = document.getElementById('status');
-        const completionDateInput = document.getElementById('completion_date');
-        const completionDateContainer = completionDateInput.closest('.mb-4');
-        
-        function updateCompletionDateVisibility() {
-            if (statusSelect.value === 'terminé') {
-                completionDateInput.setAttribute('required', 'required');
-                completionDateContainer.classList.add('required-field');
-                completionDateContainer.querySelector('.form-text').innerHTML = '<span class="text-danger">Obligatoire pour le statut "Terminé"</span>';
-            } else {
-                completionDateInput.removeAttribute('required');
-                completionDateContainer.classList.remove('required-field');
-                completionDateContainer.querySelector('.form-text').textContent = 'Remplir uniquement si le statut est "Terminé"';
-            }
-        }
-        
-        statusSelect.addEventListener('change', updateCompletionDateVisibility);
-        updateCompletionDateVisibility();
-        
-        // Add animation effects
-        const formInputs = document.querySelectorAll('.form-control, .form-select');
-        formInputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.closest('.mb-4').style.transform = 'translateX(5px)';
-            });
-            
-            input.addEventListener('blur', function() {
-                this.closest('.mb-4').style.transform = 'translateX(0)';
-            });
-        });
-        
-        // Set today's date as default for maintenance date if empty
-        const maintenanceDateInput = document.getElementById('maintenance_date');
-        if (!maintenanceDateInput.value) {
-            const today = new Date().toISOString().split('T')[0];
-            maintenanceDateInput.value = today;
-        }
-    });
-</script>
 {% endblock %}

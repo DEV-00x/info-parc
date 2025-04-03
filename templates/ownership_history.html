@@ -1,145 +1,39 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
+{% block title %}Historique des Propriétaires - {{ device.name }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-0">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Accueil</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('devices') }}">Appareils</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('device_details', device_id=device.id) }}">{{ device.name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Historique des Propriétaires</li>
-        </ol>
-    </nav>
-
-    <div class="card shadow-sm border-0 bg-gradient-primary text-white mb-4">
-        <div class="card-body py-3">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-                <div class="mb-3 mb-md-0">
-                    <h2 class="mb-0 fs-4 fs-md-2"><i class="fas fa-exchange-alt me-2"></i>Historique des Propriétaires</h2>
-                    <p class="mb-0 opacity-75 small">{{ device.name }} ({{ device.serial_number }})</p>
-                </div>
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ url_for('export_ownership_history', device_id=device.id) }}" class="btn btn-success btn-sm btn-md-normal">
-                        <i class="fas fa-file-excel me-1"></i> Exporter
-                    </a>
-                    <a href="{{ url_for('device_details', device_id=device.id) }}" class="btn btn-light btn-sm btn-md-normal">
-                        <i class="fas fa-arrow-left me-1"></i> Retour à l'Appareil
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0 p-md-3">
-            {% if ownership_changes %}
-                <div class="table-responsive">
-                    <table class="table table-hover table-striped mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="d-none d-md-table-cell">ID</th>
-                                <th>Date</th>
-                                <th>Ancien Propriétaire</th>
-                                <th>Nouveau Propriétaire</th>
-                                <th class="d-none d-md-table-cell">Notes</th>
-                                <th class="d-table-cell d-md-none text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for change in ownership_changes %}
-                            <tr>
-                                <td class="d-none d-md-table-cell">{{ change.id }}</td>
-                                <td>{{ change.change_date.strftime('%d/%m/%Y') }}<span class="d-none d-md-inline"> {{ change.change_date.strftime('%H:%M') }}</span></td>
-                                <td class="text-truncate" style="max-width: 120px;">{{ change.previous_owner or '-' }}</td>
-                                <td class="text-truncate" style="max-width: 120px;">{{ change.new_owner or '-' }}</td>
-                                <td class="d-none d-md-table-cell text-truncate" style="max-width: 200px;">{{ change.notes or '-' }}</td>
-                                <td class="d-table-cell d-md-none text-center">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#detailsModal{{ change.id }}">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    
-                                    <!-- Modal for mobile view -->
-                                    <div class="modal fade" id="detailsModal{{ change.id }}" tabindex="-1" aria-labelledby="detailsModalLabel{{ change.id }}" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="detailsModalLabel{{ change.id }}">Détails du Changement</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="mb-3">
-                                                        <strong>ID:</strong> {{ change.id }}
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <strong>Date:</strong> {{ change.change_date.strftime('%d/%m/%Y %H:%M') }}
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <strong>Ancien Propriétaire:</strong> {{ change.previous_owner or '-' }}
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <strong>Nouveau Propriétaire:</strong> {{ change.new_owner or '-' }}
-                                                    </div>
-                                                    <div>
-                                                        <strong>Notes:</strong> {{ change.notes or '-' }}
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="alert alert-info m-3 mb-0">
-                    <i class="fas fa-info-circle me-2"></i> Aucun changement de propriétaire enregistré pour cet appareil.
-                </div>
-            {% endif %}
-        </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Historique des Propriétaires - {{ device.name }}</h1>
+    <div>
+        <a href="{{ url_for('export_ownership_history', device_id=device.id) }}" class="btn btn-success">Exporter Excel</a>
+        <a href="{{ url_for('device_details', device_id=device.id) }}" class="btn btn-secondary">Retour</a>
     </div>
 </div>
 
-<style>
-    @media (max-width: 768px) {
-        .breadcrumb {
-            font-size: 0.85rem;
-        }
-        
-        .card-body {
-            padding: 0.75rem;
-        }
-        
-        .table th, .table td {
-            padding: 0.5rem;
-            font-size: 0.85rem;
-        }
-        
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-        }
-    }
-    
-    @media (min-width: 768px) {
-        .btn-md-normal {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.875rem;
-        }
-    }
-    
-    .text-truncate {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    
-    .fs-md-2 {
-        font-size: 1.75rem;
-    }
-</style>
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Ancien Propriétaire</th>
+                        <th>Nouveau Propriétaire</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for change in ownership_changes %}
+                    <tr>
+                        <td>{{ change.change_date.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>{{ change.previous_owner }}</td>
+                        <td>{{ change.new_owner }}</td>
+                        <td>{{ change.notes or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

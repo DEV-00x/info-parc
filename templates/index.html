@@ -1,331 +1,83 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
+{% block title %}Accueil{% endblock %}
 
 {% block content %}
-<div class="dashboard-header animate__animated animate__fadeIn">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
-        <h3 class="fw-bold d-flex align-items-center mb-3 mb-md-0">
-            <span class="icon-circle bg-primary text-white me-3">
-                <i class="fas fa-tachometer-alt"></i>
-            </span>
-            Tableau de Bord
-        </h3>
-        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center">
-            <div class="date-display bg-white p-2 rounded-pill shadow-sm me-0 me-sm-3 mb-2 mb-sm-0">
-                <i class="far fa-calendar-alt text-primary me-2"></i>
-                <span id="current-date"><!-- Will be filled by JavaScript --></span>
-            </div>
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-outline-primary btn-sm active" id="view-all">
-                    <i class="fas fa-th-large me-1"></i> Tout
-                </button>
-                <button type="button" class="btn btn-outline-primary btn-sm" id="view-devices">
-                    <i class="fas fa-laptop me-1"></i> Appareils
-                </button>
-                <button type="button" class="btn btn-outline-primary btn-sm" id="view-maintenance">
-                    <i class="fas fa-tools me-1"></i> Maintenance
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<h1 class="mb-4">Tableau de bord</h1>
 
-<!-- Cartes statistiques avec effets d'animation -->
-<div class="row mb-4">
-    <!-- Statistiques des appareils -->
-    <div class="col-6 col-md-3 mb-3 device-stats">
-        <div class="card border-0 shadow-sm stats-card animate__animated animate__fadeInUp" style="border-left-color: var(--primary-color)">
-            <div class="card-body p-2 p-md-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="text-muted mb-1 small">Total des Appareils</p>
-                        <h3 class="counter mb-0 fw-bold">{{ total_devices }}</h3>
-                    </div>
-                    <div class="icon-circle bg-primary">
-                        <i class="fas fa-laptop fa-lg text-white"></i>
-                    </div>
-                </div>
-                <div class="progress mt-2" style="height: 6px;">
-                    <div class="progress-bar bg-primary" role="progressbar" style="width: 100%; border-radius: 3px;"></div>
-                </div>
-            </div>
-            <a href="{{ url_for('devices') }}" class="card-footer py-2 text-decoration-none d-flex justify-content-between align-items-center bg-white">
-                <span class="text-primary fw-medium small">Voir tous</span>
-                <i class="fas fa-arrow-circle-right text-primary"></i>
-            </a>
-        </div>
-    </div>
-    
-    <div class="col-6 col-md-3 mb-3 device-stats">
-        <div class="card border-0 shadow-sm stats-card animate__animated animate__fadeInUp" style="animation-delay: 0.1s; border-left-color: var(--success-color)">
-            <div class="card-body p-2 p-md-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="text-muted mb-1 small">Appareils Actifs</p>
-                        <!-- For active devices counter -->
-                        <h3 class="counter mb-0 fw-bold" data-count="{{ active_devices }}">0</h3>
-                    </div>
-                    <div class="icon-circle bg-success">
-                        <i class="fas fa-check-circle fa-lg text-white"></i>
-                    </div>
-                </div>
-                <div class="progress mt-2" style="height: 6px;">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ (active_devices / total_devices * 100) if total_devices > 0 else 0 }}%; border-radius: 3px;"></div>
-                </div>
-            </div>
-            <a href="{{ url_for('devices') }}?status=actif" class="card-footer py-2 text-decoration-none d-flex justify-content-between align-items-center bg-white">
-                <span class="text-success fw-medium small">Voir actifs</span>
-                <i class="fas fa-arrow-circle-right text-success"></i>
-            </a>
-        </div>
-    </div>
-    
-    <div class="col-6 col-md-3 mb-3 device-stats">
-        <div class="card border-0 shadow-sm stats-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s; border-left-color: var(--warning-color)">
-            <div class="card-body p-2 p-md-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="text-muted mb-1 small">En Maintenance</p>
-                        <h3 class="counter mb-0 fw-bold">{{ maintenance_devices }}</h3>
-                    </div>
-                    <div class="icon-circle bg-warning">
-                        <i class="fas fa-tools fa-lg text-white"></i>
-                    </div>
-                </div>
-                <div class="progress mt-2" style="height: 6px;">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (maintenance_devices / total_devices * 100) if total_devices > 0 else 0 }}%; border-radius: 3px;"></div>
-                </div>
-            </div>
-            <a href="{{ url_for('devices') }}?status=en+maintenance" class="card-footer py-2 text-decoration-none d-flex justify-content-between align-items-center bg-white">
-                <span class="text-warning fw-medium small">Voir maintenance</span>
-                <i class="fas fa-arrow-circle-right text-warning"></i>
-            </a>
-        </div>
-    </div>
-    
-    <div class="col-6 col-md-3 mb-3 device-stats">
-        <div class="card border-0 shadow-sm stats-card animate__animated animate__fadeInUp" style="animation-delay: 0.3s; border-left-color: var(--danger-color)">
-            <div class="card-body p-2 p-md-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="text-muted mb-1 small">Appareils Inactifs</p>
-                        <h3 class="counter mb-0 fw-bold">{{ inactive_devices }}</h3>
-                    </div>
-                    <div class="icon-circle bg-danger">
-                        <i class="fas fa-times-circle fa-lg text-white"></i>
-                    </div>
-                </div>
-                <div class="progress mt-2" style="height: 6px;">
-                    <div class="progress-bar bg-danger" role="progressbar" style="width: {{ (inactive_devices / total_devices * 100) if total_devices > 0 else 0 }}%; border-radius: 3px;"></div>
-                </div>
-            </div>
-            <a href="{{ url_for('devices') }}?status=inactif" class="card-footer py-2 text-decoration-none d-flex justify-content-between align-items-center bg-white">
-                <span class="text-danger fw-medium small">Voir inactifs</span>
-                <i class="fas fa-arrow-circle-right text-danger"></i>
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- Activités récentes et maintenance -->
 <div class="row">
-    <!-- Derniers appareils ajoutés -->
-    <div class="col-md-12 col-lg-6 mb-4 device-section">
-        <div class="card border-0 shadow-sm hover-card animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
-            <div class="card-header bg-white py-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold d-flex align-items-center">
-                        <span class="icon-circle bg-primary text-white me-2" style="width: 36px; height: 36px;">
-                            <i class="fas fa-laptop-code"></i>
-                        </span>
-                        Appareils Récents
-                    </h5>
-                    <a href="{{ url_for('devices') }}" class="btn btn-sm btn-primary rounded-pill">
-                        <i class="fas fa-list me-1"></i> Voir Tous
-                    </a>
-                </div>
+    <div class="col-md-3">
+        <div class="card stats-card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Appareils</h5>
+                <p class="card-text display-4">{{ total_devices }}</p>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Nom</th>
-                                <th>Type</th>
-                                <th>Statut</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for device in recent_devices %}
-                            <tr class="animate__animated animate__fadeIn" style="animation-delay: {{ loop.index * 0.05 }}s">
-                                <td class="fw-medium">{{ device.name }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="device-icon rounded-circle p-2 me-2 
-                                            {% if device.type == 'ordinateur de bureau' %}bg-primary-light text-primary
-                                            {% elif device.type == 'ordinateur portable' %}bg-info-light text-info
-                                            {% elif device.type == 'imprimante' %}bg-success-light text-success
-                                            {% else %}bg-secondary-light text-secondary{% endif %}">
-                                            {% if device.type == 'ordinateur de bureau' %}
-                                                <i class="fas fa-desktop"></i>
-                                            {% elif device.type == 'ordinateur portable' %}
-                                                <i class="fas fa-laptop"></i>
-                                            {% elif device.type == 'imprimante' %}
-                                                <i class="fas fa-print"></i>
-                                            {% else %}
-                                                <i class="fas fa-hdd"></i>
-                                            {% endif %}
-                                        </div>
-                                        <span class="d-none d-md-inline">{{ device.type }}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge rounded-pill bg-{{ 'success' if device.status == 'actif' else 'warning' if device.status == 'en maintenance' else 'danger' }}">
-                                        {{ device.status }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="btn-group">
-                                        <a href="{{ url_for('device_details', device_id=device.id) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="Voir Détails">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ url_for('edit_device', device_id=device.id) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Appareils Actifs</h5>
+                <p class="card-text display-4">{{ active_devices }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">En Maintenance</h5>
+                <p class="card-text display-4">{{ maintenance_devices }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card bg-danger text-white">
+            <div class="card-body">
+                <h5 class="card-title">Inactifs</h5>
+                <p class="card-text display-4">{{ inactive_devices }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Derniers Appareils Ajoutés</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for device in recent_devices %}
+                    <a href="{{ url_for('device_details', device_id=device.id) }}" class="list-group-item list-group-item-action">
+                        {{ device.name }} - {{ device.type }}
+                        <span class="badge bg-{{ 'success' if device.status == 'actif' else 'warning' if device.status == 'en maintenance' else 'danger' }} float-end">
+                            {{ device.status }}
+                        </span>
+                    </a>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Maintenance récente -->
-    <div class="col-md-12 col-lg-6 mb-4 maintenance-section">
-        <div class="card border-0 shadow-sm hover-card animate__animated animate__fadeIn" style="animation-delay: 0.3s;">
-            <div class="card-header bg-white py-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold d-flex align-items-center">
-                        <span class="icon-circle bg-warning text-white me-2" style="width: 36px; height: 36px;">
-                            <i class="fas fa-tools"></i>
-                        </span>
-                        Maintenance Récente
-                    </h5>
-                    <a href="{{ url_for('maintenance') }}" class="btn btn-sm btn-warning rounded-pill">
-                        <i class="fas fa-list me-1"></i> Voir Tous
-                    </a>
-                </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Dernières Maintenances</h5>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Appareil</th>
-                                <th>Date</th>
-                                <th>Statut</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for record in recent_maintenance %}
-                            <tr class="animate__animated animate__fadeIn" style="animation-delay: {{ loop.index * 0.05 }}s">
-                                <td class="fw-medium">{{ record.device.name }}</td>
-                                <td>{{ record.maintenance_date.strftime('%d/%m/%Y') }}</td>
-                                <td>
-                                    <span class="badge rounded-pill bg-{{ 'success' if record.status == 'terminé' else 'warning' if record.status == 'en cours' else 'info' }}">
-                                        {{ record.status }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="btn-group">
-                                        <a href="{{ url_for('edit_maintenance', record_id=record.id) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url_for('print_maintenance', record_id=record.id) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Imprimer" target="_blank">
-                                            <i class="fas fa-print"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for record in recent_maintenance %}
+                    <a href="{{ url_for('device_details', device_id=record.device_id) }}" class="list-group-item list-group-item-action">
+                        {{ record.device.name }} - {{ record.maintenance_date.strftime('%d/%m/%Y') }}
+                        <span class="badge bg-{{ 'success' if record.status == 'terminé' else 'warning' if record.status == 'en cours' else 'secondary' }} float-end">
+                            {{ record.status }}
+                        </span>
+                    </a>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    // Set current date in French
-    document.addEventListener('DOMContentLoaded', function() {
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const today = new Date();
-        document.getElementById('current-date').textContent = today.toLocaleDateString('fr-FR', options);
-        
-        // View toggle functionality
-        document.getElementById('view-all').addEventListener('click', function() {
-            document.querySelectorAll('.device-stats, .device-section, .maintenance-section').forEach(el => {
-                el.style.display = 'block';
-            });
-            setActiveButton(this);
-        });
-        
-        document.getElementById('view-devices').addEventListener('click', function() {
-            document.querySelectorAll('.device-stats, .device-section').forEach(el => {
-                el.style.display = 'block';
-            });
-            document.querySelectorAll('.maintenance-section').forEach(el => {
-                el.style.display = 'none';
-            });
-            setActiveButton(this);
-        });
-        
-        document.getElementById('view-maintenance').addEventListener('click', function() {
-            document.querySelectorAll('.maintenance-section').forEach(el => {
-                el.style.display = 'block';
-            });
-            document.querySelectorAll('.device-stats, .device-section').forEach(el => {
-                el.style.display = 'none';
-            });
-            setActiveButton(this);
-        });
-        
-        function setActiveButton(activeButton) {
-            document.querySelectorAll('#view-all, #view-devices, #view-maintenance').forEach(button => {
-                button.classList.remove('active');
-            });
-            activeButton.classList.add('active');
-        }
-        
-        // Initialize counters with animation
-        const counters = document.querySelectorAll('.counter');
-        counters.forEach(counter => {
-            const target = parseInt(counter.getAttribute('data-count') || counter.innerText);
-            let start = 0;
-            const duration = 1000; // Animation duration in milliseconds
-            const frameDuration = 1000/60; // 60fps
-            const totalFrames = Math.round(duration/frameDuration);
-            const increment = target / totalFrames;
-            
-            const animate = () => {
-                start += increment;
-                if (start < target) {
-                    counter.innerText = Math.floor(start);
-                    requestAnimationFrame(animate);
-                } else {
-                    counter.innerText = target;
-                }
-            };
-            
-            animate();
-        });
-    });
-</script>
 {% endblock %}
